@@ -2,14 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SMART-AV | 3D Бумажный каталог</title>
+    <title>SMART-AV | Интерактивный 3D Каталог</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
         body {
             margin: 0;
             overflow: hidden;
@@ -18,11 +17,9 @@
             color: white;
             user-select: none;
         }
-        
         canvas {
             display: block;
         }
-        
         .header {
             position: absolute;
             top: 20px;
@@ -32,25 +29,18 @@
             z-index: 100;
             pointer-events: none;
         }
-        
         .logo {
             font-size: 48px;
             font-weight: 800;
             color: white;
-            margin-bottom: 5px;
             text-shadow: 0 2px 10px rgba(0, 200, 255, 0.4);
         }
-        
-        .logo span {
-            color: #00c8ff;
-        }
-        
+        .logo span { color: #00c8ff; }
         .subtitle {
             color: #a0b0ff;
             font-size: 16px;
             opacity: 0.9;
         }
-        
         .controls {
             position: absolute;
             bottom: 30px;
@@ -60,7 +50,6 @@
             gap: 20px;
             z-index: 100;
         }
-        
         .btn {
             padding: 12px 30px;
             background: linear-gradient(135deg, rgba(0, 200, 255, 0.9), rgba(0, 136, 221, 0.9));
@@ -76,22 +65,20 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
         .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 200, 255, 0.5);
         }
-        
         .btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
             transform: none !important;
         }
-        
         .page-indicator {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 10px 20px;
@@ -102,24 +89,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
         }
-        
-        .hint {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #8899cc;
-            text-align: center;
-            line-height: 1.6;
-            max-width: 600px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 15px 25px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-        }
-        
         .loading {
             position: absolute;
             top: 50%;
@@ -129,60 +98,24 @@
             color: #00c8ff;
             z-index: 1000;
         }
-        
-        .fullscreen-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(0, 200, 255, 0.15);
-            border: 2px solid rgba(0, 200, 255, 0.4);
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .fullscreen-btn:hover {
-            background: rgba(0, 200, 255, 0.3);
-            transform: scale(1.1);
-        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">SMART<span>AV</span></div>
-        <p class="subtitle">3D бумажный каталог с реалистичной физикой</p>
+        <p class="subtitle">Интерактивный 3D Каталог</p>
     </div>
     
-    <button class="fullscreen-btn" id="fullscreen-btn">⛶</button>
-    
     <div class="page-indicator">
-        Страница: <span id="current-page">0</span> / <span id="total-pages">15</span>
+        Разворот: <span id="current-page">0</span> / <span id="total-pages">0</span>
     </div>
     
     <div class="controls">
         <button id="prev-btn" class="btn">◀ Назад</button>
         <button id="next-btn" class="btn">Вперед ▶</button>
-        <button id="reset-btn" class="btn">↻ Сброс</button>
     </div>
     
-    <div class="hint">
-        <p>• <strong>ЛКМ + движение</strong> – вращать книгу</p>
-        <p>• <strong>ПКМ + движение</strong> – перемещать камеру</p>
-        <p>• <strong>Колесо мыши</strong> – приблизить/отдалить</p>
-        <p>• <strong>Клик по странице</strong> – перевернуть</p>
-        <p>• <strong>Перетащите край страницы</strong> – плавное листание</p>
-    </div>
-    
-    <div class="loading" id="loading">
-        Загрузка 3D книги...
-    </div>
+    <div class="loading" id="loading">Загрузка каталога...</div>
 
     <script type="importmap">
         {
@@ -192,460 +125,188 @@
             }
         }
     </script>
-
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { DragControls } from 'three/addons/controls/DragControls.js';
 
-        // Глобальные переменные
-        let scene, camera, renderer, orbitControls, dragControls;
-        let book, pages = [];
-        let currentPageIndex = 0;
+        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+        let scene, camera, renderer, controls;
+        let book; 
+        const sheets = []; // Массив для хранения "листов" книги
+        let currentSheet = 0;
         let isTurning = false;
-        let interactivePages = [];
-        
-        // Размеры страницы
-        const PAGE_WIDTH = 8;
-        const PAGE_HEIGHT = 6;
-        const PAGE_THICKNESS = 0.02;
-        const PAGE_CURVATURE = 0.5; // Изгиб страницы
-        
-        // Изображения для страниц (0-15)
-        const PAGE_IMAGES = [
-            'SMART-AV_company0.jpg',   // 0 - Обложка
-            'SMART-AV_company1.jpg',   // 1 - Разворот 1-2
-            'SMART-AV_company2.jpg',   // 2
-            'SMART-AV_company3.jpg',   // 3 - Разворот 3-4
-            'SMART-AV_company4.jpg',   // 4
-            'SMART-AV_company5.jpg',   // 5 - Разворот 5-6
-            'SMART-AV_company6.jpg',   // 6
-            'SMART-AV_company7.jpg',   // 7 - Разворот 7-8
-            'SMART-AV_company8.jpg',   // 8
-            'SMART-AV_company9.jpg',   // 9 - Разворот 9-10
-            'SMART-AV_company10.jpg',  // 10
-            'SMART-AV_company11.jpg',  // 11 - Разворот 11-12
-            'SMART-AV_company12.jpg',  // 12
-            'SMART-AV_company13.jpg',  // 13 - Разворот 13-14
-            'SMART-AV_company14.jpg',  // 14
-            'SMART-AV_company15.jpg'   // 15 - Задняя обложка
-        ];
 
-        // Система анимаций
-        const animations = [];
-        function animateTo(target, property, endValue, duration = 1000, easing = 'easeInOut') {
-            const startValue = target[property];
+        // --- КОНФИГУРАЦИЯ КНИГИ ---
+        const PAGE_WIDTH = 8;
+        const PAGE_HEIGHT = PAGE_WIDTH * 1.414; // Пропорции A4 (√2)
+        const PAGE_THICKNESS = 0.03; // Толщина одного листа
+        const TOTAL_IMAGES = 16; // Общее количество JPG-файлов
+        const TOTAL_SHEETS = TOTAL_IMAGES / 2; // Количество листов в книге
+
+        // --- Tween-движок для плавной анимации ---
+        const tweens = [];
+        function tween(object, property, targetValue, duration, onComplete = () => {}) {
+            const startValue = object[property];
             const startTime = Date.now();
-            
-            const animation = {
-                target,
-                property,
-                startValue,
-                endValue,
-                startTime,
-                duration,
-                easing,
-                update: function() {
-                    const elapsed = Date.now() - this.startTime;
-                    let progress = Math.min(elapsed / this.duration, 1);
-                    
-                    // Easing функции
-                    if (this.easing === 'easeInOut') {
-                        progress = progress < 0.5 
-                            ? 2 * progress * progress 
-                            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-                    } else if (this.easing === 'easeOut') {
-                        progress = 1 - Math.pow(1 - progress, 3);
-                    }
-                    
-                    this.target[this.property] = this.startValue + (this.endValue - this.startValue) * progress;
-                    
+            const t = {
+                update: () => {
+                    const elapsed = Date.now() - startTime;
+                    let progress = Math.min(elapsed / duration, 1);
+                    // Easing (смягчение) для плавности
+                    progress = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                    object[property] = startValue + (targetValue - startValue) * progress;
                     if (progress >= 1) {
-                        const index = animations.indexOf(this);
-                        if (index > -1) animations.splice(index, 1);
+                        tweens.splice(tweens.indexOf(t), 1);
+                        onComplete();
                     }
                 }
             };
-            
-            animations.push(animation);
-            return animation;
+            tweens.push(t);
         }
 
-        // Инициализация
+        // --- ИНИЦИАЛИЗАЦИЯ ---
+        init();
+        animate();
+
         async function init() {
-            // Создаем сцену
+            // 1. Сцена
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0a0a1a);
-            
-            // Создаем камеру
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 12);
-            
-            // Создаем рендерер
+
+            // 2. Камера
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 18);
+            camera.lookAt(0, 0, 0);
+
+            // 3. Рендерер
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
-            
-            // Освещение
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(5, 10, 7);
-            directionalLight.castShadow = true;
-            directionalLight.shadow.camera.left = -10;
-            directionalLight.shadow.camera.right = 10;
-            directionalLight.shadow.camera.top = 10;
-            directionalLight.shadow.camera.bottom = -10;
-            scene.add(directionalLight);
-            
-            // Создаем книгу
+
+            // 4. Освещение
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            dirLight.position.set(5, 10, 7);
+            dirLight.castShadow = true;
+            dirLight.shadow.camera.left = -PAGE_WIDTH * 2;
+            dirLight.shadow.camera.right = PAGE_WIDTH * 2;
+            dirLight.shadow.camera.top = PAGE_HEIGHT * 2;
+            dirLight.shadow.camera.bottom = -PAGE_HEIGHT * 2;
+            scene.add(dirLight);
+
+            // 5. Создание самой книги
             book = new THREE.Group();
             scene.add(book);
             
-            // Загружаем текстуры и создаем страницы
-            await createPages();
+            await createBookSheets();
             
-            // Настройка управления
-            setupControls();
+            // 6. Управление
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.maxDistance = 40;
+            controls.minDistance = 10;
+            controls.maxPolarAngle = Math.PI * 0.8;
             
-            // Скрываем загрузку
+            // 7. UI и события
             document.getElementById('loading').style.display = 'none';
+            document.getElementById('total-pages').textContent = TOTAL_SHEETS -1;
+            updateUI();
             
-            // Обновляем индикатор
-            updatePageIndicator();
-            
-            // Анимационный цикл
-            animate();
+            document.getElementById('prev-btn').addEventListener('click', flipPrev);
+            document.getElementById('next-btn').addEventListener('click', flipNext);
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') flipPrev();
+                if (e.key === 'ArrowRight') flipNext();
+            });
         }
-
-        async function createPages() {
-            // Создаем геометрию для страницы с изгибом
-            const pageGeometry = createCurvedPageGeometry();
+        
+        async function createBookSheets() {
+            const textureLoader = new THREE.TextureLoader();
+            const imagePath = 'images/SMART-AV_company'; // Путь к вашим изображениям
             
-            for (let i = 0; i < PAGE_IMAGES.length; i++) {
-                const pageGroup = new THREE.Group();
+            // --- СОЗДАНИЕ ЛИСТОВ КНИГИ ---
+            // Логика: каждый лист - это плоскость с двумя текстурами (лицо и оборот)
+            
+            for (let i = 0; i < TOTAL_SHEETS; i++) {
+                const sheetGroup = new THREE.Group();
+                const geometry = new THREE.PlaneGeometry(PAGE_WIDTH, PAGE_HEIGHT);
+
+                // Индексы изображений для этого листа
+                const frontImageIndex = i * 2;
+                const backImageIndex = i * 2 + 1;
                 
-                // Загружаем текстуру
-                let texture;
-                try {
-                    texture = await loadTexture(`images/${PAGE_IMAGES[i]}`);
-                } catch (error) {
-                    // Создаем заглушку
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 1024;
-                    canvas.height = 768;
-                    const ctx = canvas.getContext('2d');
-                    
-                    if (i === 0) {
-                        // Обложка
-                        ctx.fillStyle = '#2c3e50';
-                        ctx.fillRect(0, 0, 1024, 768);
-                        ctx.fillStyle = 'white';
-                        ctx.font = 'bold 60px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('SMART-AV', 512, 300);
-                        ctx.font = '30px Arial';
-                        ctx.fillText('Каталог', 512, 380);
-                    } else if (i === PAGE_IMAGES.length - 1) {
-                        // Задняя обложка
-                        ctx.fillStyle = '#34495e';
-                        ctx.fillRect(0, 0, 1024, 768);
-                        ctx.fillStyle = 'white';
-                        ctx.font = 'bold 40px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('Задняя обложка', 512, 384);
-                    } else {
-                        // Внутренние страницы
-                        ctx.fillStyle = i % 2 === 0 ? '#f8f9fa' : '#ffffff';
-                        ctx.fillRect(0, 0, 1024, 768);
-                        ctx.fillStyle = '#333';
-                        ctx.font = 'bold 40px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(`Страница ${i}`, 512, 384);
-                        ctx.font = '20px Arial';
-                        ctx.fillText('SMART-AV', 512, 450);
-                    }
-                    
-                    texture = new THREE.CanvasTexture(canvas);
-                }
+                // Загружаем текстуры для обеих сторон
+                const frontTexture = await textureLoader.loadAsync(`${imagePath}${frontImageIndex}.jpg`);
+                const backTexture = (backImageIndex < TOTAL_IMAGES) ? await textureLoader.loadAsync(`${imagePath}${backImageIndex}.jpg`) : null;
+
+                // Материалы
+                const frontMaterial = new THREE.MeshStandardMaterial({ map: frontTexture, side: THREE.FrontSide, roughness: 0.6 });
+                // Если есть оборотная сторона, используем ее, иначе - просто серый цвет
+                const backMaterial = backTexture 
+                    ? new THREE.MeshStandardMaterial({ map: backTexture, side: THREE.BackSide, roughness: 0.6 })
+                    : new THREE.MeshStandardMaterial({ color: 0xeeeeee, side: THREE.BackSide, roughness: 0.6 });
                 
-                texture.encoding = THREE.sRGBEncoding;
+                const sheetMesh = new THREE.Mesh(geometry, [frontMaterial, backMaterial]);
+                sheetMesh.castShadow = true;
+                sheetMesh.receiveShadow = true;
                 
-                // Создаем материал с текстурой
-                const frontMaterial = new THREE.MeshStandardMaterial({ 
-                    map: texture,
-                    roughness: 0.7,
-                    metalness: 0.1,
-                    side: THREE.FrontSide
-                });
+                // Важно: смещаем плоскость так, чтобы ее край был в центре группы
+                sheetMesh.position.x = PAGE_WIDTH / 2;
+                sheetGroup.add(sheetMesh);
                 
-                const backMaterial = new THREE.MeshStandardMaterial({ 
-                    color: 0xf5f5f5,
-                    roughness: 0.8,
-                    metalness: 0.05,
-                    side: THREE.BackSide
-                });
+                // Смещаем сам лист по оси Z для создания толщины стопки
+                sheetGroup.position.z = -i * PAGE_THICKNESS;
                 
-                // Создаем меш с двойным материалом
-                const pageMesh = new THREE.Mesh(pageGeometry, [backMaterial, frontMaterial]);
-                pageMesh.castShadow = true;
-                pageMesh.receiveShadow = true;
-                
-                // Настройка позиции и поворота
-                if (i === 0) {
-                    // Обложка
-                    pageGroup.rotation.y = Math.PI / 2;
-                    pageGroup.position.x = PAGE_WIDTH / 2;
-                } else if (i === PAGE_IMAGES.length - 1) {
-                    // Задняя обложка
-                    pageGroup.rotation.y = -Math.PI / 2;
-                    pageGroup.position.x = -PAGE_WIDTH / 2;
-                } else {
-                    // Внутренние страницы
-                    const isRightPage = i % 2 === 0;
-                    pageGroup.rotation.y = isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                    pageGroup.position.x = isRightPage ? PAGE_WIDTH / 2 : -PAGE_WIDTH / 2;
-                    
-                    // Для левых страниц сразу переворачиваем
-                    if (!isRightPage) {
-                        pageGroup.userData.isFlipped = true;
-                    }
-                }
-                
-                // Смещаем страницы по Z, чтобы они не пересекались
-                pageGroup.position.z = -i * PAGE_THICKNESS * 1.5;
-                
-                pageGroup.add(pageMesh);
-                book.add(pageGroup);
-                
-                // Сохраняем страницу
-                pages.push({
-                    group: pageGroup,
-                    mesh: pageMesh,
-                    index: i,
-                    isRightPage: i % 2 === 0,
-                    isCover: i === 0 || i === PAGE_IMAGES.length - 1
-                });
-                
-                // Для интерактивных страниц (не обложки)
-                if (i > 0 && i < PAGE_IMAGES.length - 1) {
-                    interactivePages.push(pageGroup);
-                }
+                book.add(sheetGroup);
+                sheets.push(sheetGroup);
             }
         }
-
-        function createCurvedPageGeometry() {
-            // Создаем геометрию с изгибом для реалистичности
-            const geometry = new THREE.PlaneGeometry(PAGE_WIDTH, PAGE_HEIGHT, 32, 32);
-            
-            // Применяем изгиб
-            const position = geometry.attributes.position;
-            for (let i = 0; i < position.count; i++) {
-                const x = position.getX(i);
-                const z = position.getZ(i);
-                
-                // Изгиб по краям
-                const curve = Math.sin((x / PAGE_WIDTH + 0.5) * Math.PI) * PAGE_CURVATURE;
-                position.setZ(i, curve);
-            }
-            
-            geometry.computeVertexNormals();
-            return geometry;
-        }
-
-        function loadTexture(url) {
-            return new Promise((resolve, reject) => {
-                new THREE.TextureLoader().load(url, resolve, undefined, reject);
-            });
-        }
-
-        function setupControls() {
-            // OrbitControls для вращения камеры
-            orbitControls = new OrbitControls(camera, renderer.domElement);
-            orbitControls.enableDamping = true;
-            orbitControls.dampingFactor = 0.05;
-            orbitControls.minDistance = 5;
-            orbitControls.maxDistance = 20;
-            orbitControls.maxPolarAngle = Math.PI / 2;
-            
-            // DragControls для перетаскивания страниц
-            dragControls = new DragControls(interactivePages, camera, renderer.domElement);
-            dragControls.addEventListener('dragstart', (event) => {
-                orbitControls.enabled = false;
-            });
-            
-            dragControls.addEventListener('dragend', (event) => {
-                orbitControls.enabled = true;
-                
-                // Проверяем, нужно ли перевернуть страницу
-                const pageGroup = event.object;
-                const pageIndex = pages.findIndex(p => p.group === pageGroup);
-                const page = pages[pageIndex];
-                
-                if (page && !page.isCover) {
-                    const rotation = pageGroup.rotation.y;
-                    const shouldFlip = Math.abs(rotation) > Math.PI / 4;
-                    
-                    if (shouldFlip) {
-                        flipPage(pageIndex);
-                    } else {
-                        // Возвращаем на место
-                        const targetRotation = page.isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                        animateTo(pageGroup.rotation, 'y', targetRotation, 500);
-                    }
-                }
-            });
-            
-            // Обработчики кнопок
-            document.getElementById('prev-btn').addEventListener('click', () => flipToPage(-1));
-            document.getElementById('next-btn').addEventListener('click', () => flipToPage(1));
-            document.getElementById('reset-btn').addEventListener('click', resetBook);
-            document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
-            
-            // Клик по странице для перелистывания
-            renderer.domElement.addEventListener('click', (event) => {
-                event.preventDefault();
-                
-                // Получаем координаты клика
-                const rect = renderer.domElement.getBoundingClientRect();
-                const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-                
-                // Raycast для определения кликнутой страницы
-                const raycaster = new THREE.Raycaster();
-                raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
-                
-                const intersects = raycaster.intersectObjects(interactivePages, true);
-                
-                if (intersects.length > 0) {
-                    const pageGroup = intersects[0].object.parent;
-                    const pageIndex = pages.findIndex(p => p.group === pageGroup);
-                    
-                    if (pageIndex > -1 && !pages[pageIndex].isCover) {
-                        flipPage(pageIndex);
-                    }
-                }
-            });
-            
-            // Клавиатура
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'ArrowLeft') flipToPage(-1);
-                if (event.key === 'ArrowRight') flipToPage(1);
-                if (event.key === ' ') flipCurrentPage();
-                if (event.key === 'Home') goToPage(0);
-                if (event.key === 'End') goToPage(PAGE_IMAGES.length - 1);
-                if (event.key === 'f' || event.key === 'F') toggleFullscreen();
-            });
-        }
-
-        function flipPage(pageIndex) {
-            if (isTurning) return;
-            
-            const page = pages[pageIndex];
-            if (!page || page.isCover) return;
+        
+        function flipNext() {
+            if (isTurning || currentSheet >= sheets.length) return;
             
             isTurning = true;
+            const sheetToFlip = sheets[currentSheet];
             
-            // Определяем целевой поворот
-            const targetRotation = page.group.userData.isFlipped 
-                ? (page.isRightPage ? Math.PI / 2 : -Math.PI / 2)
-                : (page.isRightPage ? -Math.PI / 2 : Math.PI / 2);
-            
-            // Анимируем поворот
-            const animation = animateTo(page.group.rotation, 'y', targetRotation, 1200, 'easeOut');
-            
-            // Звук перелистывания
-            playPageSound();
-            
-            // Обновляем состояние
-            animation.onComplete = () => {
-                page.group.userData.isFlipped = !page.group.userData.isFlipped;
+            tween(sheetToFlip.rotation, 'y', -Math.PI, 1500, () => {
+                currentSheet++;
                 isTurning = false;
-                
-                // Обновляем текущую страницу
-                if (!page.group.userData.isFlipped) {
-                    currentPageIndex = Math.max(0, currentPageIndex - 1);
-                } else {
-                    currentPageIndex = Math.min(PAGE_IMAGES.length - 1, currentPageIndex + 1);
-                }
-                
-                updatePageIndicator();
-            };
-        }
-
-        function flipToPage(direction) {
-            if (isTurning) return;
-            
-            // Находим следующую переворачиваемую страницу
-            let targetPageIndex = -1;
-            
-            if (direction > 0) {
-                // Ищем следующую неперевернутую правую страницу
-                for (let i = currentPageIndex; i < pages.length; i++) {
-                    if (!pages[i].isCover && pages[i].isRightPage && !pages[i].group.userData.isFlipped) {
-                        targetPageIndex = i;
-                        break;
-                    }
-                }
-            } else {
-                // Ищем предыдущую перевернутую левую страницу
-                for (let i = currentPageIndex; i >= 0; i--) {
-                    if (!pages[i].isCover && !pages[i].isRightPage && pages[i].group.userData.isFlipped) {
-                        targetPageIndex = i;
-                        break;
-                    }
-                }
-            }
-            
-            if (targetPageIndex > -1) {
-                flipPage(targetPageIndex);
-            }
-        }
-
-        function flipCurrentPage() {
-            // Переворачиваем текущую страницу
-            const currentPage = pages[currentPageIndex];
-            if (currentPage && !currentPage.isCover) {
-                flipPage(currentPageIndex);
-            }
-        }
-
-        function goToPage(pageIndex) {
-            // Сбрасываем все страницы
-            pages.forEach((page, index) => {
-                if (!page.isCover) {
-                    const targetRotation = index <= pageIndex 
-                        ? (page.isRightPage ? -Math.PI / 2 : Math.PI / 2)
-                        : (page.isRightPage ? Math.PI / 2 : -Math.PI / 2);
-                    
-                    page.group.rotation.y = targetRotation;
-                    page.group.userData.isFlipped = index <= pageIndex;
-                }
+                updateUI();
             });
-            
-            currentPageIndex = pageIndex;
-            updatePageIndicator();
+            playPageSound();
         }
 
-        function resetBook() {
-            goToPage(0);
+        function flipPrev() {
+            if (isTurning || currentSheet <= 0) return;
+            
+            currentSheet--;
+            isTurning = true;
+            const sheetToFlip = sheets[currentSheet];
+
+            tween(sheetToFlip.rotation, 'y', 0, 1500, () => {
+                isTurning = false;
+                updateUI();
+            });
+            playPageSound();
         }
 
-        function updatePageIndicator() {
-            document.getElementById('current-page').textContent = currentPageIndex;
-            document.getElementById('total-pages').textContent = PAGE_IMAGES.length - 1;
+        function updateUI() {
+            // Обновляем номер страницы
+            // Для пользователя "разворот 0" - это обложка, "разворот 1" - стр. 2-3 и т.д.
+            const displayPage = (currentSheet === 0) ? 0 : Math.ceil((currentSheet * 2) / 2);
+            document.getElementById('current-page').textContent = displayPage;
             
-            // Обновляем состояние кнопок
-            document.getElementById('prev-btn').disabled = currentPageIndex <= 0;
-            document.getElementById('next-btn').disabled = currentPageIndex >= PAGE_IMAGES.length - 1;
+            // Включаем/выключаем кнопки
+            document.getElementById('prev-btn').disabled = isTurning || currentSheet <= 0;
+            document.getElementById('next-btn').disabled = isTurning || currentSheet >= sheets.length - 1;
         }
 
         function playPageSound() {
-            try {
+            // Простой синтезированный звук, чтобы не требовать аудио-файлы
+             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -653,26 +314,17 @@
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                oscillator.frequency.value = 120 + Math.random() * 40;
-                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(1500, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
+                oscillator.type = 'square';
                 
-                gainNode.gain.setValueAtTime(0.015, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.25);
                 
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.3);
             } catch (e) {
-                // Игнорируем ошибки аудио
-            }
-        }
-
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-                document.getElementById('fullscreen-btn').textContent = '✕';
-            } else {
-                document.exitFullscreen();
-                document.getElementById('fullscreen-btn').textContent = '⛶';
+                // Аудио может не работать в некоторых контекстах, это нормально
             }
         }
 
@@ -684,27 +336,11 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            
-            // Обновляем анимации
-            animations.forEach(anim => anim.update());
-            
-            // Обновляем управление
-            orbitControls.update();
-            
-            // Рендерим сцену
+            tweens.forEach(t => t.update());
+            controls.update();
             renderer.render(scene, camera);
         }
 
-        // Инициализация
-        window.addEventListener('load', init);
-        window.addEventListener('resize', onWindowResize);
-        
-        // Обработчик полноэкранного режима
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                document.getElementById('fullscreen-btn').textContent = '⛶';
-            }
-        });
     </script>
 </body>
 </html>
