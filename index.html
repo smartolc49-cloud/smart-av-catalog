@@ -2,49 +2,593 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Тест изображений</title>
+    <title>SMART-AV | 3D Бумажный каталог</title>
     <style>
-        body { padding: 20px; }
-        .image-check { margin: 10px; padding: 10px; border: 1px solid #ccc; }
-        .success { background: #d4edda; }
-        .error { background: #f8d7da; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3a);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            user-select: none;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 200, 255, 0.4);
+        }
+        
+        .logo span {
+            color: #00c8ff;
+        }
+        
+        .subtitle {
+            color: #a0b0ff;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.9), rgba(0, 136, 221, 0.9));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+            box-shadow: 0 5px 15px rgba(0, 200, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 200, 255, 0.5);
+        }
+        
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .page-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+        
+        .hint {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #8899cc;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #00c8ff;
+            z-index: 1000;
+        }
+        
+        .fullscreen-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 200, 255, 0.15);
+            border: 2px solid rgba(0, 200, 255, 0.4);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fullscreen-btn:hover {
+            background: rgba(0, 200, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .debug {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #00ff88;
+            font-size: 14px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
     </style>
 </head>
 <body>
-    <h2>Проверка доступности изображений</h2>
-    <div id="results"></div>
+    <div class="header">
+        <div class="logo">SMART<span>AV</span></div>
+        <p class="subtitle">3D бумажный каталог с реалистичной физикой</p>
+    </div>
     
-    <script>
-        const images = [
-            'SMART-AV_company0.jpg', 'SMART-AV_company1.jpg', 
-            'SMART-AV_company2.jpg', 'SMART-AV_company3.jpg',
-            'SMART-AV_company4.jpg', 'SMART-AV_company5.jpg',
-            'SMART-AV_company6.jpg', 'SMART-AV_company7.jpg',
-            'SMART-AV_company8.jpg', 'SMART-AV_company9.jpg',
-            'SMART-AV_company10.jpg', 'SMART-AV_company11.jpg',
-            'SMART-AV_company12.jpg', 'SMART-AV_company13.jpg',
-            'SMART-AV_company14.jpg', 'SMART-AV_company15.jpg'
-        ];
+    <button class="fullscreen-btn" id="fullscreen-btn">⛶</button>
+    
+    <div class="page-indicator">
+        Страница: <span id="current-page">1</span> / <span id="total-pages">7</span>
+    </div>
+    
+    <div class="controls">
+        <button id="prev-btn" class="btn">◀ Назад</button>
+        <button id="next-btn" class="btn">Вперед ▶</button>
+        <button id="reset-btn" class="btn">↻ Сброс</button>
+    </div>
+    
+    <div class="hint">
+        <p>• <strong>ЛКМ + движение</strong> – вращать книгу</p>
+        <p>• <strong>Колесо мыши</strong> – приблизить/отдалить</p>
+        <p>• <strong>Клик по странице</strong> – перевернуть</p>
+        <p>• <strong>Перетащите страницу</strong> – плавное листание</p>
+    </div>
+    
+    <div class="loading" id="loading">
+        Загрузка 3D книги...
+    </div>
+    
+    <div class="debug" id="debug">Готово</div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Глобальные переменные
+        let scene, camera, renderer, orbitControls;
+        let book, pages = [];
+        let currentPageIndex = 0;
+        let isTurning = false;
         
-        images.forEach(img => {
-            const testImg = new Image();
-            const div = document.createElement('div');
-            div.className = 'image-check';
-            div.innerHTML = `<strong>${img}:</strong> <span>Проверка...</span>`;
+        // Размеры страницы
+        const PAGE_WIDTH = 8;
+        const PAGE_HEIGHT = 6;
+        const PAGE_THICKNESS = 0.02;
+        
+        // Изображения для страниц (0-7)
+        const PAGE_IMAGES = [
+            'SMART-AV_company0.jpg',   // 0 - Обложка
+            'SMART-AV_company1.jpg',   // 1
+            'SMART-AV_company2.jpg',   // 2
+            'SMART-AV_company3.jpg',   // 3
+            'SMART-AV_company4.jpg',   // 4
+            'SMART-AV_company5.jpg',   // 5
+            'SMART-AV_company6.jpg',   // 6
+            'SMART-AV_company7.jpg'    // 7 - Задняя обложка
+        ];
+
+        // Система анимаций
+        const animations = [];
+        function animateTo(target, property, endValue, duration = 1000, easing = 'easeInOut', onComplete) {
+            const startValue = target[property];
+            const startTime = Date.now();
             
-            testImg.onload = () => {
-                div.className += ' success';
-                div.querySelector('span').textContent = '✓ Найдено';
+            const animation = {
+                target,
+                property,
+                startValue,
+                endValue,
+                startTime,
+                duration,
+                easing,
+                update: function() {
+                    const elapsed = Date.now() - this.startTime;
+                    let progress = Math.min(elapsed / this.duration, 1);
+                    
+                    if (this.easing === 'easeInOut') {
+                        progress = progress < 0.5 
+                            ? 2 * progress * progress 
+                            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                    } else if (this.easing === 'easeOut') {
+                        progress = 1 - Math.pow(1 - progress, 3);
+                    }
+                    
+                    this.target[this.property] = this.startValue + (this.endValue - this.startValue) * progress;
+                    
+                    if (progress >= 1) {
+                        const index = animations.indexOf(this);
+                        if (index > -1) animations.splice(index, 1);
+                        if (onComplete) onComplete();
+                    }
+                }
             };
             
-            testImg.onerror = () => {
-                div.className += ' error';
-                div.querySelector('span').textContent = '✗ Не найдено';
-                div.innerHTML += `<br><small>Путь: ./images/${img}</small>`;
-            };
+            animations.push(animation);
+            return animation;
+        }
+
+        // Инициализация
+        async function init() {
+            debug('Начало инициализации...');
             
-            testImg.src = `./images/${img}`;
-            document.getElementById('results').appendChild(div);
+            // Создаем сцену
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+            
+            // Создаем камеру
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 2, 12);
+            
+            // Создаем рендерер
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.body.appendChild(renderer.domElement);
+            
+            // Освещение
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(10, 20, 15);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            // Создаем книгу
+            book = new THREE.Group();
+            scene.add(book);
+            
+            debug('Загрузка страниц...');
+            // Создаем страницы
+            await createPages();
+            debug('Страницы созданы!');
+            
+            // Настройка управления
+            setupControls();
+            
+            // Скрываем загрузку
+            document.getElementById('loading').style.display = 'none';
+            
+            // Обновляем индикатор
+            updatePageIndicator();
+            
+            debug('Инициализация завершена!');
+            
+            // Анимационный цикл
+            animate();
+        }
+
+        async function createPages() {
+            debug('Создаем геометрию страниц...');
+            const pageGeometry = new THREE.PlaneGeometry(PAGE_WIDTH, PAGE_HEIGHT, 8, 8);
+            
+            // Создаем все страницы
+            for (let i = 0; i < PAGE_IMAGES.length; i++) {
+                debug(`Создаем страницу ${i}: ${PAGE_IMAGES[i]}`);
+                
+                const pageGroup = new THREE.Group();
+                let frontMaterial, backMaterial;
+                
+                // ПРОСТОЙ ТЕСТ - используем цветные материалы
+                const colors = [
+                    0x2c3e50, 0x3498db, 0x2ecc71, 0xe74c3c,
+                    0x9b59b6, 0xf1c40f, 0x1abc9c, 0x7f8c8d
+                ];
+                
+                frontMaterial = new THREE.MeshStandardMaterial({ 
+                    color: colors[i] || 0x3498db,
+                    roughness: 0.6,
+                    metalness: 0.1,
+                    side: THREE.FrontSide
+                });
+                
+                // Задняя сторона всегда серая
+                backMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0xf5f5f5,
+                    roughness: 0.8,
+                    metalness: 0.05,
+                    side: THREE.BackSide
+                });
+                
+                // Создаем меш с двойным материалом
+                const pageMesh = new THREE.Mesh(pageGeometry, [backMaterial, frontMaterial]);
+                pageMesh.castShadow = true;
+                pageMesh.receiveShadow = true;
+                
+                // Определяем тип страницы
+                const isRightPage = i % 2 === 0; // Четные - правые страницы
+                const isCover = i === 0 || i === PAGE_IMAGES.length - 1;
+                
+                // Настройка позиции и поворота
+                if (i === 0) {
+                    // Обложка (правая)
+                    pageGroup.rotation.y = Math.PI / 2;
+                    pageGroup.position.x = PAGE_WIDTH / 2;
+                    pageGroup.userData.isFlipped = false;
+                } else if (i === PAGE_IMAGES.length - 1) {
+                    // Задняя обложка (левая)
+                    pageGroup.rotation.y = -Math.PI / 2;
+                    pageGroup.position.x = -PAGE_WIDTH / 2;
+                    pageGroup.userData.isFlipped = false;
+                } else {
+                    // Внутренние страницы
+                    pageGroup.rotation.y = isRightPage ? Math.PI / 2 : -Math.PI / 2;
+                    pageGroup.position.x = isRightPage ? PAGE_WIDTH / 2 : -PAGE_WIDTH / 2;
+                    pageGroup.userData.isFlipped = !isRightPage;
+                }
+                
+                // Смещаем страницы по Z (толщина книги)
+                pageGroup.position.z = -i * PAGE_THICKNESS * 1.2;
+                
+                pageGroup.add(pageMesh);
+                book.add(pageGroup);
+                
+                // Сохраняем страницу
+                pages.push({
+                    group: pageGroup,
+                    mesh: pageMesh,
+                    index: i,
+                    isRightPage: isRightPage,
+                    isCover: isCover,
+                    isFlipped: pageGroup.userData.isFlipped
+                });
+                
+                debug(`✓ Страница ${i} создана`);
+            }
+            
+            debug(`Всего страниц: ${pages.length}`);
+        }
+
+        function setupControls() {
+            // OrbitControls для вращения камеры
+            orbitControls = new OrbitControls(camera, renderer.domElement);
+            orbitControls.enableDamping = true;
+            orbitControls.dampingFactor = 0.05;
+            orbitControls.minDistance = 5;
+            orbitControls.maxDistance = 25;
+            orbitControls.maxPolarAngle = Math.PI / 2;
+            
+            // Обработчики кнопок
+            document.getElementById('prev-btn').addEventListener('click', () => flipToPage(-1));
+            document.getElementById('next-btn').addEventListener('click', () => flipToPage(1));
+            document.getElementById('reset-btn').addEventListener('click', resetBook);
+            document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+            
+            // Клик по странице для перелистывания
+            renderer.domElement.addEventListener('click', (event) => {
+                event.preventDefault();
+                
+                // Просто переворачиваем следующую страницу
+                if (!isTurning && currentPageIndex < pages.length - 2) {
+                    flipToPage(1);
+                }
+            });
+            
+            // Клавиатура
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowLeft') flipToPage(-1);
+                if (event.key === 'ArrowRight') flipToPage(1);
+                if (event.key === ' ') resetBook();
+                if (event.key === 'f' || event.key === 'F') toggleFullscreen();
+            });
+        }
+
+        function flipToPage(direction) {
+            if (isTurning) return;
+            
+            // Определяем какую страницу переворачивать
+            let targetIndex = -1;
+            
+            if (direction > 0) {
+                // Ищем следующую неперевернутую правую страницу
+                for (let i = currentPageIndex + 1; i < pages.length - 1; i++) {
+                    const page = pages[i];
+                    if (!page.isCover && page.isRightPage && !page.isFlipped) {
+                        targetIndex = i;
+                        break;
+                    }
+                }
+            } else {
+                // Ищем предыдущую перевернутую левую страницу
+                for (let i = currentPageIndex - 1; i > 0; i--) {
+                    const page = pages[i];
+                    if (!page.isCover && !page.isRightPage && page.isFlipped) {
+                        targetIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (targetIndex > -1) {
+                flipPage(targetIndex, direction);
+            }
+        }
+
+        function flipPage(pageIndex, direction) {
+            if (isTurning) return;
+            
+            const page = pages[pageIndex];
+            if (!page || page.isCover) return;
+            
+            isTurning = true;
+            
+            // Определяем целевой поворот
+            let targetRotation;
+            if (direction > 0) {
+                // Переворачиваем вперед
+                targetRotation = page.isRightPage ? -Math.PI / 2 : Math.PI / 2;
+            } else {
+                // Переворачиваем назад
+                targetRotation = page.isRightPage ? Math.PI / 2 : -Math.PI / 2;
+            }
+            
+            debug(`Переворачиваем страницу ${pageIndex} в направлении ${direction}`);
+            
+            // Анимируем поворот
+            animateTo(page.group.rotation, 'y', targetRotation, 800, 'easeOut', () => {
+                // Обновляем состояние
+                page.isFlipped = !page.isFlipped;
+                page.group.userData.isFlipped = page.isFlipped;
+                isTurning = false;
+                
+                // Обновляем текущую страницу
+                if (direction > 0) {
+                    currentPageIndex = page.isRightPage ? pageIndex + 1 : pageIndex;
+                } else {
+                    currentPageIndex = page.isRightPage ? pageIndex - 1 : pageIndex - 2;
+                }
+                
+                // Ограничиваем границы
+                currentPageIndex = Math.max(0, Math.min(pages.length - 1, currentPageIndex));
+                
+                updatePageIndicator();
+                debug(`Текущая страница: ${currentPageIndex}`);
+            });
+        }
+
+        function resetBook() {
+            debug('Сброс книги в начальное состояние');
+            
+            // Возвращаем все страницы в исходное положение
+            pages.forEach((page) => {
+                if (!page.isCover) {
+                    const targetRotation = page.isRightPage ? Math.PI / 2 : -Math.PI / 2;
+                    page.group.rotation.y = targetRotation;
+                    page.isFlipped = !page.isRightPage;
+                    page.group.userData.isFlipped = page.isFlipped;
+                }
+            });
+            
+            currentPageIndex = 0;
+            updatePageIndicator();
+        }
+
+        function updatePageIndicator() {
+            // Показываем текущую страницу разворота (1-7)
+            const displayPage = Math.floor(currentPageIndex / 2) + 1;
+            document.getElementById('current-page').textContent = displayPage;
+            document.getElementById('total-pages').textContent = Math.floor((PAGE_IMAGES.length - 1) / 2);
+            
+            // Включаем/выключаем кнопки
+            document.getElementById('prev-btn').disabled = isTurning || currentPageIndex <= 0;
+            document.getElementById('next-btn').disabled = isTurning || currentPageIndex >= pages.length - 2;
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                document.getElementById('fullscreen-btn').textContent = '✕';
+            } else {
+                document.exitFullscreen();
+                document.getElementById('fullscreen-btn').textContent = '⛶';
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Обновляем анимации
+            animations.forEach(anim => anim.update());
+            
+            // Обновляем управление
+            orbitControls.update();
+            
+            // Рендерим сцену
+            renderer.render(scene, camera);
+        }
+
+        function debug(message) {
+            console.log(message);
+            const debugEl = document.getElementById('debug');
+            if (debugEl) {
+                debugEl.textContent = message;
+            }
+        }
+
+        // Инициализация
+        window.addEventListener('load', init);
+        window.addEventListener('resize', onWindowResize);
+        
+        // Обработчик полноэкранного режима
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                document.getElementById('fullscreen-btn').textContent = '⛶';
+            }
         });
     </script>
 </body>
