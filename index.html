@@ -3,795 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART-AV | 3D Бумажный каталог</title>
+    <title>SMART-AV | Реалистичный 3D Каталог</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
             color: white;
             overflow: hidden;
             height: 100vh;
         }
         
-        /* ХЕДЕР */
-        .header {
+        /* UI ЭЛЕМЕНТЫ */
+        .ui-layer {
             position: absolute;
-            top: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            z-index: 100;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
+            z-index: 10;
         }
         
-        .logo {
-            font-size: 42px;
-            font-weight: 800;
+        .header {
+            position: absolute; top: 30px; width: 100%; text-align: center;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .logo { font-size: 36px; font-weight: 800; letter-spacing: 2px; }
+        .logo span { color: #00d2ff; }
+        .subtitle { color: #8899ac; font-size: 14px; margin-top: 5px; }
+
+        .controls {
+            position: absolute; bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 20px;
+            pointer-events: auto;
+        }
+        
+        .btn {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 10px rgba(0, 200, 255, 0.4);
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 12px;
             letter-spacing: 1px;
         }
-        
-        .logo span {
-            color: #00c8ff;
-        }
-        
-        .subtitle {
-            color: #a0b0ff;
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        /* КАНВАС Three.js */
-        #container3d {
-            width: 100%;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        
-        /* ИНФО ПАНЕЛЬ */
-        .info-panel {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 16px;
-        }
-        
-        /* КОНТРОЛЫ */
-        .controls {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            z-index: 100;
-        }
-        
-        .control-btn {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, rgba(0, 200, 255, 0.9), rgba(0, 136, 221, 0.9));
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 110px;
-            box-shadow: 0 5px 15px rgba(0, 200, 255, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .control-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 200, 255, 0.5);
-        }
-        
-        .control-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        /* ПОДСКАЗКИ */
-        .hints {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #8899cc;
-            text-align: center;
-            line-height: 1.6;
-            max-width: 600px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 15px 25px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-            font-size: 14px;
-        }
-        
-        .hints p {
-            margin: 5px 0;
-        }
-        
-        /* ЗАГРУЗКА */
+        .btn:hover { background: #00d2ff; color: #000; box-shadow: 0 0 20px rgba(0,210,255,0.4); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; background: transparent; box-shadow: none; }
+
         .loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            text-align: center;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 1000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.5s;
         }
-        
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #00c8ff;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            width: 40px; height: 40px; border: 3px solid #333;
+            border-top: 3px solid #00d2ff; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* ФУЛЛСКРИН */
-        .fullscreen-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(0, 200, 255, 0.15);
-            border: 2px solid rgba(0, 200, 255, 0.4);
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .fullscreen-btn:hover {
-            background: rgba(0, 200, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        /* ОТЛАДКА */
-        .debug {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: #00ff88;
-            font-size: 12px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.7);
-            padding: 5px 10px;
-            border-radius: 5px;
-            opacity: 0.7;
-        }
+        #container3d { width: 100%; height: 100vh; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">SMART<span>AV</span></div>
-        <p class="subtitle">3D бумажный каталог с реалистичным листанием</p>
-    </div>
-    
-    <div class="fullscreen-btn" id="fullscreen-btn" title="Полный экран">⛶</div>
-    
-    <div class="info-panel">
-        Страница: <span id="current-page">1</span> / <span id="total-pages">7</span>
-    </div>
-    
-    <div id="container3d"></div>
-    
-    <div class="controls">
-        <button id="prev-btn" class="control-btn">← Назад</button>
-        <button id="next-btn" class="control-btn">Вперед →</button>
-        <button id="reset-btn" class="control-btn">Сброс</button>
-    </div>
-    
-    <div class="hints">
-        <p>• <strong>ЛКМ + движение</strong> – вращать книгу вокруг</p>
-        <p>• <strong>ПКМ + движение</strong> – перемещать книгу</p>
-        <p>• <strong>Колесо мыши</strong> – приблизить/отдалить</p>
-        <p>• <strong>Клик на угол страницы</strong> – начать перелистывание</p>
-        <p>• <strong>Стрелки ← →</strong> – листать страницы</p>
-    </div>
-    
+
     <div class="loader" id="loader">
         <div class="spinner"></div>
-        <div>Загрузка 3D каталога...</div>
+        <p>Генерация геометрии...</p>
     </div>
-    
-    <div class="debug" id="debug"></div>
 
-    <!-- Three.js библиотеки -->
+    <div class="ui-layer">
+        <div class="header">
+            <div class="logo">SMART<span>AV</span></div>
+            <div class="subtitle">Интерактивный каталог v2.0</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="prev">Назад</button>
+            <button class="btn" id="next">Вперед</button>
+        </div>
+    </div>
+
+    <div id="container3d"></div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DragControls.min.js"></script>
-    
-    <script>
-        // КОНФИГУРАЦИЯ
-        const CONFIG = {
-            pageWidth: 5,
-            pageHeight: 7,
-            pageThickness: 0.005,
-            totalPages: 16,
-            images: [
-                'images/SMART-AV_company0.jpg',
-                'images/SMART-AV_company1.jpg',
-                'images/SMART-AV_company2.jpg',
-                'images/SMART-AV_company3.jpg',
-                'images/SMART-AV_company4.jpg',
-                'images/SMART-AV_company5.jpg',
-                'images/SMART-AV_company6.jpg',
-                'images/SMART-AV_company7.jpg',
-                'images/SMART-AV_company8.jpg',
-                'images/SMART-AV_company9.jpg',
-                'images/SMART-AV_company10.jpg',
-                'images/SMART-AV_company11.jpg',
-                'images/SMART-AV_company12.jpg',
-                'images/SMART-AV_company13.jpg',
-                'images/SMART-AV_company14.jpg',
-                'images/SMART-AV_company15.jpg'
-            ]
-        };
 
-        class Book3D {
+    <script>
+        class RealisticBook {
             constructor() {
                 this.scene = null;
                 this.camera = null;
                 this.renderer = null;
-                this.controls = null;
-                this.book = null;
+                this.bookGroup = null;
                 this.pages = [];
-                this.currentPage = 0;
-                this.isTurning = false;
-                this.raycaster = new THREE.Raycaster();
-                this.mouse = new THREE.Vector2();
-                this.dragging = false;
-                this.dragStart = null;
-                this.dragPage = null;
                 
+                // Настройки книги
+                this.params = {
+                    width: 5,
+                    height: 7.2,
+                    segments: 32, // ВАЖНО: Количество сегментов для сгибания
+                    totalPages: 10,
+                    duration: 1.5 // Секунды на перелистывание
+                };
+
+                this.state = {
+                    currentPage: 0,
+                    isAnimating: false
+                };
+
                 this.init();
             }
-            
-            async init() {
-                // 1. Создаем базовые элементы Three.js
-                this.createScene();
-                
-                // 2. Создаем книгу и страницы
-                await this.createBook();
-                
-                // 3. Настройка управления
-                this.setupControls();
-                
-                // 4. Анимация
-                this.animate();
-                
-                // 5. Скрываем загрузку
-                document.getElementById('loader').style.display = 'none';
-                
-                this.updateUI();
-            }
-            
-            createScene() {
-                // Сцена
+
+            init() {
+                // 1. Инициализация сцены
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x0a0a1a);
-                
-                // Камера
-                this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.set(0, 1, 10);
-                
-                // Рендерер
+                // Красивый туман для глубины
+                this.scene.fog = new THREE.FogExp2(0x0a0a10, 0.02);
+
+                this.camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+                this.camera.position.set(0, 5, 14);
+
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(window.devicePixelRatio);
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-                
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
                 document.getElementById('container3d').appendChild(this.renderer.domElement);
-                
-                // Освещение
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-                this.scene.add(ambientLight);
-                
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(5, 10, 7);
-                directionalLight.castShadow = true;
-                this.scene.add(directionalLight);
-                
-                // Управление камерой
+
+                // 2. Свет
+                const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+                this.scene.add(ambient);
+
+                const spotLight = new THREE.SpotLight(0xffffff, 1);
+                spotLight.position.set(5, 15, 10);
+                spotLight.angle = 0.5;
+                spotLight.penumbra = 0.5;
+                spotLight.castShadow = true;
+                spotLight.shadow.bias = -0.0001;
+                this.scene.add(spotLight);
+
+                // 3. Создание книги
+                this.createBook();
+
+                // 4. Контролы камеры
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.enableDamping = true;
-                this.controls.dampingFactor = 0.05;
-                this.controls.minDistance = 3;
+                this.controls.enablePan = false;
+                this.controls.maxPolarAngle = Math.PI / 2; // Не давать смотреть снизу
+                this.controls.minDistance = 8;
                 this.controls.maxDistance = 20;
-                this.controls.maxPolarAngle = Math.PI / 2;
-                
-                // Обработка ресайза
-                window.addEventListener('resize', () => this.onWindowResize());
+
+                // 5. События
+                this.bindEvents();
+                this.animate();
+
+                // Убираем лоадер
+                setTimeout(() => {
+                    document.getElementById('loader').style.opacity = 0;
+                    setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+                }, 1000);
             }
-            
-            async createBook() {
-                this.book = new THREE.Group();
-                this.scene.add(this.book);
-                
-                // Создаем геометрию страницы
-                const pageGeometry = new THREE.PlaneGeometry(
-                    CONFIG.pageWidth, 
-                    CONFIG.pageHeight
+
+            createBook() {
+                this.bookGroup = new THREE.Group();
+                this.scene.add(this.bookGroup);
+
+                // Создаем обложку (чуть больше страниц)
+                // Можно добавить отдельно, но для простоты опустим
+
+                // Генерируем страницы
+                const geom = new THREE.PlaneGeometry(
+                    this.params.width, 
+                    this.params.height, 
+                    this.params.segments, // X сегменты (нужны для сгиба)
+                    2 // Y сегменты
                 );
-                
-                // Загружаем текстуры и создаем страницы
-                const textures = [];
-                
-                for (let i = 0; i < CONFIG.totalPages; i++) {
-                    try {
-                        const texture = await this.loadTexture(CONFIG.images[i]);
-                        textures.push(texture);
-                    } catch (error) {
-                        console.warn(`Не удалось загрузить: ${CONFIG.images[i]}`, error);
-                        // Создаем тестовую текстуру
-                        const canvas = this.createTestTexture(i);
-                        const texture = new THREE.CanvasTexture(canvas);
-                        textures.push(texture);
-                    }
+
+                // Смещаем геометрию так, чтобы ось вращения (pivot) была слева
+                geom.translate(this.params.width / 2, 0, 0);
+
+                // Сохраняем "базовую" позицию вершин, чтобы от нее считать деформацию
+                const basePositions = new Float32Array(geom.attributes.position.count * 3);
+                for(let i=0; i<geom.attributes.position.count; i++){
+                    basePositions[i*3] = geom.attributes.position.getX(i);
+                    basePositions[i*3+1] = geom.attributes.position.getY(i);
+                    basePositions[i*3+2] = geom.attributes.position.getZ(i);
                 }
-                
-                // Создаем страницы
-                for (let i = 0; i < CONFIG.totalPages; i++) {
-                    const isRightPage = i % 2 === 0; // Четные - правые страницы
-                    const isCover = i === 0 || i === CONFIG.totalPages - 1;
+                // Добавляем атрибут в геометрию (кастомный)
+                geom.userData.basePositions = basePositions;
+
+                for (let i = 0; i < this.params.totalPages; i++) {
+                    const group = new THREE.Group();
                     
                     // Материалы
-                    const frontMaterial = new THREE.MeshBasicMaterial({
-                        map: textures[i],
-                        side: THREE.FrontSide,
-                        transparent: true,
-                        opacity: 1
-                    });
+                    const color = new THREE.Color().setHSL(i * 0.1, 0.5, 0.5);
                     
-                    const backMaterial = new THREE.MeshBasicMaterial({
-                        color: isCover ? 0x333333 : 0xf0f0f0,
+                    // Текстура с текстом
+                    const canvasTexture = this.createPageTexture(i, color);
+
+                    const matFront = new THREE.MeshStandardMaterial({ 
+                        map: canvasTexture,
+                        roughness: 0.8,
+                        metalness: 0.1,
+                        side: THREE.FrontSide
+                    });
+
+                    const matBack = new THREE.MeshStandardMaterial({ 
+                        color: 0xffffff,
+                        roughness: 0.9,
                         side: THREE.BackSide
                     });
+
+                    // Клонируем геометрию для каждой страницы, чтобы гнуть их независимо
+                    const pageGeom = geom.clone();
+                    pageGeom.userData.basePositions = basePositions; // Копируем ссылку на базу
+
+                    const mesh = new THREE.Mesh(pageGeom, [matFront, matBack]);
                     
-                    // Меш страницы
-                    const pageMesh = new THREE.Mesh(
-                        pageGeometry, 
-                        [backMaterial, frontMaterial]
-                    );
+                    // Для правильного рендеринга двустороннего материала в Three.js с группами
+                    // проще сделать два меша или использовать side: DoubleSide, 
+                    // но для изгиба лучше использовать один меш с multi-material.
+                    // Однако PlaneGeometry имеет только 1 группу граней.
+                    // Хак: используем DoubleSide на переднем, но при изгибе это может дать артефакты.
+                    // Лучший способ для этого кода:
+                    mesh.material = new THREE.MeshStandardMaterial({
+                        map: canvasTexture,
+                        roughness: 0.6,
+                        side: THREE.DoubleSide
+                    });
                     
-                    pageMesh.castShadow = true;
-                    pageMesh.receiveShadow = true;
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    mesh.customDepthMaterial = new THREE.MeshDepthMaterial({
+                        depthPacking: THREE.RGBADepthPacking
+                    });
+
+                    // Z-fighting fix (слои)
+                    group.position.z = -i * 0.02; 
                     
-                    // Группа для страницы (для вращения)
-                    const pageGroup = new THREE.Group();
-                    
-                    if (i === 0) {
-                        // Передняя обложка
-                        pageGroup.rotation.y = Math.PI / 2;
-                        pageGroup.position.x = CONFIG.pageWidth / 2;
-                        pageMesh.userData = { type: 'cover', index: i, isRightPage: true };
-                    } else if (i === CONFIG.totalPages - 1) {
-                        // Задняя обложка
-                        pageGroup.rotation.y = -Math.PI / 2;
-                        pageGroup.position.x = -CONFIG.pageWidth / 2;
-                        pageMesh.userData = { type: 'cover', index: i, isRightPage: false };
-                    } else {
-                        // Обычные страницы
-                        const rotation = isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                        const positionX = isRightPage ? CONFIG.pageWidth / 2 : -CONFIG.pageWidth / 2;
-                        
-                        pageGroup.rotation.y = rotation;
-                        pageGroup.position.x = positionX;
-                        pageMesh.userData = {
-                            type: 'page',
-                            index: i,
-                            isRightPage: isRightPage,
-                            isFlipped: false
-                        };
-                    }
-                    
-                    // Расположение по Z (толщина книги)
-                    pageGroup.position.z = -i * CONFIG.pageThickness;
-                    
-                    pageGroup.add(pageMesh);
-                    this.book.add(pageGroup);
+                    // Начальная позиция (все страницы справа)
+                    group.rotation.y = 0;
+
+                    group.add(mesh);
+                    this.bookGroup.add(group);
                     
                     this.pages.push({
-                        group: pageGroup,
-                        mesh: pageMesh,
-                        index: i,
-                        isRightPage: isRightPage,
-                        isCover: isCover,
-                        isFlipped: pageGroup.rotation.y > 0 ? false : true
+                        group: group,
+                        mesh: mesh,
+                        idx: i,
+                        flipped: false
                     });
                 }
-                
-                console.log(`Создано ${this.pages.length} страниц`);
             }
-            
-            loadTexture(url) {
-                return new Promise((resolve, reject) => {
-                    const loader = new THREE.TextureLoader();
-                    loader.load(
-                        url,
-                        (texture) => {
-                            texture.encoding = THREE.sRGBEncoding;
-                            texture.minFilter = THREE.LinearFilter;
-                            texture.magFilter = THREE.LinearFilter;
-                            resolve(texture);
-                        },
-                        undefined,
-                        (error) => {
-                            reject(error);
-                        }
-                    );
-                });
-            }
-            
-            createTestTexture(pageIndex) {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024;
-                canvas.height = 768;
-                const ctx = canvas.getContext('2d');
+
+            // Математика изгиба вершин (Сердце эффекта)
+            bendPage(page, angleRotation, direction) {
+                const mesh = page.mesh;
+                const positions = mesh.geometry.attributes.position;
+                const basePositions = mesh.geometry.userData.basePositions;
                 
-                // Градиентный фон
-                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                // Угол от 0 до PI
+                const rot = Math.abs(angleRotation);
                 
-                if (pageIndex === 0) {
-                    gradient.addColorStop(0, '#1a237e');
-                    gradient.addColorStop(1, '#283593');
-                } else if (pageIndex === CONFIG.totalPages - 1) {
-                    gradient.addColorStop(0, '#0d47a1');
-                    gradient.addColorStop(1, '#1565c0');
-                } else {
-                    const hue = (pageIndex * 30) % 360;
-                    gradient.addColorStop(0, `hsl(${hue}, 70%, 85%)`);
-                    gradient.addColorStop(1, `hsl(${hue}, 70%, 95%)`);
+                // Сила изгиба зависит от угла поворота.
+                // Максимальный изгиб, когда страница вертикально (PI/2)
+                // Math.sin(rot) даст 1.0 в середине пути
+                const bendAmount = Math.sin(rot) * 1.5; 
+
+                for (let i = 0; i < positions.count; i++) {
+                    const x = basePositions[i * 3];
+                    const y = basePositions[i * 3 + 1];
+                    const z = basePositions[i * 3 + 2];
+
+                    // Нормализуем X (от 0 у корешка до 1 у края)
+                    const normalizedX = x / this.params.width;
+
+                    // Формула деформации
+                    // Мы поднимаем Z (на зрителя) тем сильнее, чем ближе к центру перелистывания,
+                    // и чем дальше вершина от корешка.
+                    // Добавляем нелинейность pow(normalizedX, 2) чтобы гнулся край, а не корешок.
+                    
+                    const deformationZ = bendAmount * Math.pow(normalizedX, 2) * 2.0;
+
+                    // Применяем
+                    positions.setXYZ(i, x, y, z + deformationZ);
                 }
+
+                positions.needsUpdate = true;
                 
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Текст
-                ctx.fillStyle = '#333';
-                ctx.font = 'bold 36px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                if (pageIndex === 0) {
-                    ctx.fillText('SMART-AV', canvas.width/2, canvas.height/2 - 50);
-                    ctx.font = '28px Arial';
-                    ctx.fillText('КАТАЛОГ 2024', canvas.width/2, canvas.height/2 + 20);
-                } else if (pageIndex === CONFIG.totalPages - 1) {
-                    ctx.fillText('КОНЕЦ', canvas.width/2, canvas.height/2);
-                } else {
-                    ctx.fillText(`Страница ${pageIndex}`, canvas.width/2, canvas.height/2);
-                }
-                
-                return canvas;
+                // Критически важно для света! Пересчитываем нормали, иначе страница будет плоской на вид
+                mesh.geometry.computeVertexNormals();
             }
-            
-            setupControls() {
-                // Обработчики кнопок
-                document.getElementById('prev-btn').addEventListener('click', () => this.turnPage(-1));
-                document.getElementById('next-btn').addEventListener('click', () => this.turnPage(1));
-                document.getElementById('reset-btn').addEventListener('click', () => this.resetBook());
-                document.getElementById('fullscreen-btn').addEventListener('click', () => this.toggleFullscreen());
-                
-                // Клик по странице
-                this.renderer.domElement.addEventListener('mousedown', (e) => this.onMouseDown(e));
-                this.renderer.domElement.addEventListener('mousemove', (e) => this.onMouseMove(e));
-                this.renderer.domElement.addEventListener('mouseup', () => this.onMouseUp());
-                
-                // Клавиатура
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'ArrowLeft') this.turnPage(-1);
-                    if (e.key === 'ArrowRight') this.turnPage(1);
-                    if (e.key === ' ') this.resetBook();
-                    if (e.key === 'f' || e.key === 'F') this.toggleFullscreen();
-                });
-            }
-            
+
             turnPage(direction) {
-                if (this.isTurning) return;
-                
-                const pagesToTurn = [];
-                
-                // Находим страницы для переворота
-                if (direction > 0) {
-                    // Листаем вперед
-                    for (let i = this.currentPage; i < this.pages.length; i++) {
-                        const page = this.pages[i];
-                        if (!page.isCover && page.isRightPage && !page.isFlipped) {
-                            pagesToTurn.push(page);
-                            break;
-                        }
+                if (this.state.isAnimating) return;
+
+                let targetPageIdx = -1;
+
+                if (direction > 0) { // Вперед
+                    if (this.state.currentPage < this.pages.length) {
+                        targetPageIdx = this.state.currentPage;
                     }
-                } else {
-                    // Листаем назад
-                    for (let i = this.currentPage; i >= 0; i--) {
-                        const page = this.pages[i];
-                        if (!page.isCover && !page.isRightPage && page.isFlipped) {
-                            pagesToTurn.push(page);
-                            break;
-                        }
+                } else { // Назад
+                    if (this.state.currentPage > 0) {
+                        targetPageIdx = this.state.currentPage - 1;
                     }
                 }
+
+                if (targetPageIdx === -1) return;
+
+                this.state.isAnimating = true;
+                const page = this.pages[targetPageIdx];
                 
-                if (pagesToTurn.length > 0) {
-                    this.animatePageTurn(pagesToTurn[0], direction);
-                }
-            }
-            
-            animatePageTurn(page, direction) {
-                this.isTurning = true;
+                // Определяем целевой угол
+                const startRot = page.group.rotation.y;
+                const endRot = direction > 0 ? -Math.PI + 0.05 : 0; // Небольшой зазор 0.05 чтобы не мерцало
                 
-                const startRotation = page.group.rotation.y;
-                const targetRotation = startRotation + (direction * Math.PI);
+                // Анимация
                 const startTime = Date.now();
-                const duration = 1000;
-                
-                const animate = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                const duration = 1200; // мс
+
+                const animateTurn = () => {
+                    const now = Date.now();
+                    let progress = (now - startTime) / duration;
                     
-                    // Плавная анимация
-                    const easeProgress = this.easeOutCubic(progress);
-                    page.group.rotation.y = startRotation + (targetRotation - startRotation) * easeProgress;
-                    
-                    // Эффект изгиба
-                    const bendAmount = Math.sin(progress * Math.PI) * 0.3;
-                    page.group.rotation.z = bendAmount * direction;
-                    
+                    if (progress > 1) progress = 1;
+
+                    // Easing (плавность)
+                    const ease = 1 - Math.pow(1 - progress, 3); // Cubic out
+
+                    // 1. Вращаем группу
+                    const currentRot = startRot + (endRot - startRot) * ease;
+                    page.group.rotation.y = currentRot;
+
+                    // 2. Гнем геометрию
+                    // Передаем угол относительно "плоского" состояния
+                    // Если листаем вперед: 0 -> -PI. Середина -PI/2.
+                    // Нам нужна дельта от начала движения
+                    this.bendPage(page, currentRot + (direction > 0 ? 0 : Math.PI), direction);
+
                     if (progress < 1) {
-                        requestAnimationFrame(animate);
+                        requestAnimationFrame(animateTurn);
                     } else {
-                        page.group.rotation.z = 0;
-                        page.isFlipped = !page.isFlipped;
-                        this.isTurning = false;
-                        
-                        // Обновляем текущую страницу
+                        // Конец анимации
+                        this.state.isAnimating = false;
                         if (direction > 0) {
-                            this.currentPage = page.index + 1;
+                            this.state.currentPage++;
+                            // Чуть "распрямить" в конце, чтобы убрать остаточную деформацию
+                            this.bendPage(page, 0, direction); 
                         } else {
-                            this.currentPage = page.index - 1;
+                            this.state.currentPage--;
+                            this.bendPage(page, 0, direction);
                         }
-                        
-                        this.currentPage = Math.max(0, Math.min(CONFIG.totalPages - 1, this.currentPage));
                         this.updateUI();
-                        
-                        // Звук перелистывания
-                        this.playFlipSound();
                     }
                 };
                 
-                animate();
+                animateTurn();
             }
-            
-            easeOutCubic(t) {
-                return 1 - Math.pow(1 - t, 3);
-            }
-            
-            onMouseDown(event) {
-                event.preventDefault();
-                
-                // Получаем координаты мыши
-                const rect = this.renderer.domElement.getBoundingClientRect();
-                this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-                
-                // Проверяем клик по странице
-                this.raycaster.setFromCamera(this.mouse, this.camera);
-                const intersects = this.raycaster.intersectObjects(this.pages.map(p => p.mesh));
-                
-                if (intersects.length > 0) {
-                    const clickedPage = this.pages.find(p => p.mesh === intersects[0].object);
-                    
-                    if (clickedPage && !clickedPage.isCover) {
-                        this.dragging = true;
-                        this.dragPage = clickedPage;
-                        this.dragStart = { x: event.clientX, y: event.clientY };
-                        
-                        // Определяем направление перелистывания
-                        const localPoint = intersects[0].point;
-                        const pageCenter = clickedPage.group.position;
-                        
-                        if (localPoint.x > pageCenter.x) {
-                            this.dragDirection = 1; // Перелистываем вперед
-                        } else {
-                            this.dragDirection = -1; // Перелистываем назад
-                        }
-                    }
-                }
-            }
-            
-            onMouseMove(event) {
-                if (!this.dragging || !this.dragPage) return;
-                
-                const deltaX = event.clientX - this.dragStart.x;
-                const progress = Math.min(Math.max(deltaX / 300, -1), 1) * this.dragDirection;
-                
-                // Анимация перелистывания при перетаскивании
-                const startRotation = this.dragPage.isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                const targetRotation = startRotation + (Math.PI * progress);
-                
-                this.dragPage.group.rotation.y = targetRotation;
-                
-                // Эффект изгиба
-                this.dragPage.group.rotation.z = Math.sin(progress * Math.PI / 2) * 0.2 * this.dragDirection;
-            }
-            
-            onMouseUp() {
-                if (this.dragging && this.dragPage) {
-                    const deltaRotation = this.dragPage.group.rotation.y;
-                    const startRotation = this.dragPage.isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                    const progress = Math.abs(deltaRotation - startRotation) / Math.PI;
-                    
-                    // Если перетащили достаточно далеко - переворачиваем страницу
-                    if (progress > 0.3) {
-                        this.animatePageTurn(this.dragPage, this.dragDirection);
-                    } else {
-                        // Возвращаем на место
-                        this.animatePageReturn(this.dragPage);
-                    }
-                    
-                    this.dragging = false;
-                    this.dragPage = null;
-                }
-            }
-            
-            animatePageReturn(page) {
-                const startRotation = page.group.rotation.y;
-                const targetRotation = page.isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                const startTime = Date.now();
-                const duration = 300;
-                
-                const animate = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    const easeProgress = this.easeOutCubic(progress);
-                    page.group.rotation.y = startRotation + (targetRotation - startRotation) * easeProgress;
-                    page.group.rotation.z = 0;
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    }
-                };
-                
-                animate();
-            }
-            
-            resetBook() {
-                // Возвращаем все страницы в исходное положение
-                this.pages.forEach(page => {
-                    if (!page.isCover) {
-                        const targetRotation = page.isRightPage ? Math.PI / 2 : -Math.PI / 2;
-                        page.group.rotation.y = targetRotation;
-                        page.isFlipped = page.isRightPage ? false : true;
-                    }
-                });
-                
-                this.currentPage = 0;
-                this.updateUI();
-            }
-            
-            updateUI() {
-                // Обновляем отображение текущей страницы
-                const displayPage = Math.floor(this.currentPage / 2) + 1;
-                const totalDisplayPages = Math.floor((CONFIG.totalPages - 1) / 2);
-                
-                document.getElementById('current-page').textContent = displayPage;
-                document.getElementById('total-pages').textContent = totalDisplayPages;
-                
-                // Обновляем состояние кнопок
-                document.getElementById('prev-btn').disabled = this.currentPage <= 0;
-                document.getElementById('next-btn').disabled = this.currentPage >= CONFIG.totalPages - 1;
-                
-                // Отладочная информация
-                document.getElementById('debug').textContent = 
-                    `Страница: ${this.currentPage} | Всего: ${CONFIG.totalPages}`;
-            }
-            
-            playFlipSound() {
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.frequency.value = 80 + Math.random() * 40;
-                    oscillator.type = 'sawtooth';
-                    
-                    gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
-                    
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.2);
-                } catch (e) {
-                    // Игнорируем ошибки аудио
-                }
-            }
-            
-            toggleFullscreen() {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                    document.getElementById('fullscreen-btn').textContent = '✕';
+
+            createPageTexture(index, colorObj) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 740;
+                const ctx = canvas.getContext('2d');
+
+                // Фон
+                ctx.fillStyle = index === 0 ? '#111' : '#f5f5f5';
+                ctx.fillRect(0,0,512,740);
+
+                // Рамка/Градиент корешка
+                const grad = ctx.createLinearGradient(0,0,30,0);
+                grad.addColorStop(0, 'rgba(0,0,0,0.2)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0,0,50,740);
+
+                // Текст
+                ctx.textAlign = 'center';
+                if (index === 0) {
+                    ctx.fillStyle = '#00d2ff';
+                    ctx.font = 'bold 60px Arial';
+                    ctx.fillText('SMART-AV', 256, 300);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '30px Arial';
+                    ctx.fillText('Collection 2024', 256, 350);
                 } else {
-                    document.exitFullscreen();
-                    document.getElementById('fullscreen-btn').textContent = '⛶';
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 140px Arial';
+                    ctx.globalAlpha = 0.1;
+                    ctx.fillText((index + 1).toString(), 256, 400);
+                    ctx.globalAlpha = 1.0;
+                    
+                    ctx.font = '24px Arial';
+                    ctx.fillText(`Продукт #${index+1}`, 256, 100);
+                    
+                    // Имитация текста
+                    ctx.fillStyle = '#666';
+                    for(let i=0; i<10; i++) {
+                        ctx.fillRect(60, 150 + i*40, 392, 10);
+                    }
+                    
+                    // Картинка (квадрат)
+                    ctx.fillStyle = '#' + colorObj.getHexString();
+                    ctx.fillRect(60, 550, 392, 150);
                 }
+
+                // Номер страницы
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#999';
+                ctx.fillText(index + 1, 480, 720);
+
+                return new THREE.CanvasTexture(canvas);
             }
-            
-            onWindowResize() {
-                this.camera.aspect = window.innerWidth / window.innerHeight;
-                this.camera.updateProjectionMatrix();
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+            bindEvents() {
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+
+                document.getElementById('next').addEventListener('click', () => this.turnPage(1));
+                document.getElementById('prev').addEventListener('click', () => this.turnPage(-1));
+                
+                // Стрелки клавиатуры
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') this.turnPage(1);
+                    if (e.key === 'ArrowLeft') this.turnPage(-1);
+                });
             }
-            
+
+            updateUI() {
+                document.getElementById('prev').disabled = this.state.currentPage === 0;
+                document.getElementById('next').disabled = this.state.currentPage === this.pages.length;
+            }
+
             animate() {
                 requestAnimationFrame(() => this.animate());
-                
-                if (this.controls) {
-                    this.controls.update();
-                }
-                
+                this.controls.update();
                 this.renderer.render(this.scene, this.camera);
             }
         }
-        
-        // ЗАПУСК ПРИЛОЖЕНИЯ
+
+        // Запуск
         window.addEventListener('load', () => {
-            // Проверяем доступность изображений
-            console.log('Проверка доступности изображений...');
-            
-            const book3d = new Book3D();
-            window.book3d = book3d;
-        });
-        
-        // Обработка полноэкранного режима
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                document.getElementById('fullscreen-btn').textContent = '⛶';
-            }
+            new RealisticBook();
         });
     </script>
 </body>
