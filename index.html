@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART-AV | Реалистичный 3D Каталог</title>
+    <title>SMART-AV | Бумажный каталог</title>
     <style>
         * {
             margin: 0;
@@ -67,7 +67,6 @@
             font-weight: 300;
         }
         
-        /* ОСНОВНОЙ КОНТЕЙНЕР */
         .main-container {
             width: 100%;
             max-width: 1200px;
@@ -77,7 +76,6 @@
             position: relative;
         }
         
-        /* КОНТЕЙНЕР КНИГИ */
         .book-wrapper {
             width: 1000px;
             height: 700px;
@@ -116,7 +114,6 @@
             .logo { font-size: 36px; }
         }
         
-        /* КНИГА */
         #book {
             position: absolute;
             width: 100%;
@@ -124,7 +121,6 @@
             transform-style: preserve-3d;
         }
         
-        /* СТРАНИЦЫ */
         .page {
             position: absolute;
             width: 100%;
@@ -136,20 +132,14 @@
             transition: transform 0.01s linear;
             will-change: transform;
             cursor: grab;
-            transform-origin: left center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
         }
         
-        .page.right-page {
-            transform-origin: right center;
-        }
-        
-        /* АКТИВНАЯ СТРАНИЦА (которая перелистывается) */
         .page.active {
             cursor: grabbing;
             z-index: 1000 !important;
         }
         
-        /* ИЗОБРАЖЕНИЕ */
         .page-image {
             width: 100%;
             height: 100%;
@@ -159,51 +149,6 @@
             -webkit-user-drag: none;
         }
         
-        /* ПРОСВЕТ БУМАГИ */
-        .page-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        /* ЭФФЕКТ ПРОСВЕТА ЧЕРЕЗ БУМАГУ */
-        .page-paper-effect {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 5%, transparent 95%, rgba(255,255,255,0.03) 100%),
-                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.02) 2px);
-            pointer-events: none;
-            mix-blend-mode: multiply;
-            z-index: 2;
-        }
-        
-        /* ОТРАЖЕНИЕ НА ОБОРОТНОЙ СТОРОНЕ */
-        .page-back {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #f0f0f0 0%, #f8f8f8 100%);
-            transform: rotateY(180deg);
-            backface-visibility: visible;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1;
-        }
-        
-        .page.show-back .page-back {
-            opacity: 0.3;
-        }
-        
-        /* УГОЛОК ДЛЯ ПЕРЕТАСКИВАНИЯ */
         .page-corner {
             position: absolute;
             width: 150px;
@@ -213,51 +158,54 @@
             transition: background 0.2s;
         }
         
-        /* ПРАВЫЙ ВЕРХНИЙ УГОЛ */
+        /* Уголок для перелистывания ВПЕРЕД (правый верхний) */
         .page-corner.forward {
             top: 0;
             right: 0;
-            background: linear-gradient(225deg, transparent 50%, rgba(0, 200, 255, 0.08) 50%);
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 200, 255, 0.1) 50%);
         }
         
         .page-corner.forward:hover {
-            background: linear-gradient(225deg, transparent 50%, rgba(0, 200, 255, 0.2) 50%);
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 200, 255, 0.25) 50%);
         }
         
-        /* ЛЕВЫЙ ВЕРХНИЙ УГОЛ */
+        /* Уголок для перелистывания НАЗАД (левый верхний) */
         .page-corner.backward {
             top: 0;
             left: 0;
-            background: linear-gradient(135deg, transparent 50%, rgba(0, 200, 255, 0.08) 50%);
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 200, 255, 0.1) 50%);
         }
         
         .page-corner.backward:hover {
-            background: linear-gradient(135deg, transparent 50%, rgba(0, 200, 255, 0.2) 50%);
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 200, 255, 0.25) 50%);
         }
         
-        /* ИНДИКАТОР ПЕРЕТАСКИВАНИЯ */
-        .drag-indicator {
+        /* Индикатор активного уголка */
+        .corner-hint {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            pointer-events: none;
-            z-index: 1001;
+            top: 10px;
+            color: #00c8ff;
+            font-size: 14px;
+            font-weight: 500;
             opacity: 0;
             transition: opacity 0.3s;
+            pointer-events: none;
         }
         
-        .drag-indicator.visible {
+        .corner-hint.forward-hint {
+            right: 160px;
+            top: 20px;
+        }
+        
+        .corner-hint.backward-hint {
+            left: 160px;
+            top: 20px;
+        }
+        
+        .page-corner:hover ~ .corner-hint {
             opacity: 1;
         }
         
-        .drag-arrow {
-            position: absolute;
-            font-size: 30px;
-            color: rgba(0, 200, 255, 0.7);
-            text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
-        }
-        
-        /* НОМЕР СТРАНИЦЫ */
         .page-number {
             position: absolute;
             bottom: 15px;
@@ -279,54 +227,6 @@
             left: 15px;
         }
         
-        /* ЭФФЕКТ ИСКРИВЛЕНИЯ БУМАГИ */
-        .page-curvature {
-            position: absolute;
-            top: 0;
-            width: 20px;
-            height: 100%;
-            pointer-events: none;
-            z-index: 3;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .page.curved .page-curvature {
-            opacity: 0.15;
-        }
-        
-        .page-curvature.left {
-            left: 0;
-            background: linear-gradient(90deg, rgba(0,0,0,0.1), transparent);
-        }
-        
-        .page-curvature.right {
-            right: 0;
-            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1));
-        }
-        
-        /* ЭФФЕКТ ТЕНИ ПРИ ПЕРЕЛИСТЫВАНИИ */
-        .page-shadow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, 
-                rgba(0,0,0,0) 0%,
-                rgba(0,0,0,0.05) 30%,
-                rgba(0,0,0,0.1) 50%,
-                rgba(0,0,0,0.05) 70%,
-                rgba(0,0,0,0) 100%);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            filter: blur(5px);
-        }
-        
-        .page.turning .page-shadow {
-            opacity: 1;
-        }
-        
-        /* ПАНЕЛЬ УПРАВЛЕНИЯ */
         .control-panel {
             display: flex;
             justify-content: center;
@@ -354,7 +254,6 @@
             background: rgba(0, 0, 0, 0.85);
         }
         
-        /* БОЛЬШИЕ КНОПКИ */
         .big-btn {
             padding: 16px 45px !important;
             font-size: 20px !important;
@@ -382,8 +281,6 @@
             justify-content: center;
             gap: 10px;
             box-shadow: 0 6px 20px rgba(0, 200, 255, 0.4);
-            position: relative;
-            overflow: hidden;
         }
         
         .control-btn:hover:not(:disabled) {
@@ -395,10 +292,8 @@
             opacity: 0.4;
             cursor: not-allowed;
             transform: none !important;
-            box-shadow: 0 4px 12px rgba(0, 200, 255, 0.2);
         }
         
-        /* ИНФОРМАЦИЯ О СТРАНИЦЕ */
         .page-info {
             font-size: 24px;
             color: #00c8ff;
@@ -414,7 +309,6 @@
             font-size: 28px;
         }
         
-        /* КНОПКА ПОЛНОГО ЭКРАНА */
         .fullscreen-btn {
             position: absolute !important;
             top: 15px;
@@ -438,7 +332,6 @@
             transform: scale(1.1);
         }
         
-        /* БЫСТРАЯ НАВИГАЦИЯ */
         .quick-nav {
             display: flex;
             justify-content: center;
@@ -465,7 +358,6 @@
         .quick-btn:hover {
             background: rgba(0, 200, 255, 0.25);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 200, 255, 0.3);
         }
         
         .quick-btn.active {
@@ -474,7 +366,6 @@
             box-shadow: 0 0 15px rgba(0, 200, 255, 0.5);
         }
         
-        /* СТАТУС */
         .status {
             padding: 15px 30px;
             border-radius: 12px;
@@ -484,25 +375,10 @@
             display: none;
         }
         
-        .loading {
-            background: linear-gradient(135deg, rgba(0, 200, 255, 0.1), rgba(0, 80, 200, 0.1));
-            color: #00c8ff;
-            border: 1px solid rgba(0, 200, 255, 0.3);
-        }
+        .loading { background: linear-gradient(135deg, rgba(0, 200, 255, 0.1), rgba(0, 80, 200, 0.1)); color: #00c8ff; border: 1px solid rgba(0, 200, 255, 0.3); }
+        .success { background: linear-gradient(135deg, rgba(0, 255, 100, 0.1), rgba(0, 180, 80, 0.1)); color: #00ff80; border: 1px solid rgba(0, 255, 100, 0.3); }
+        .error { background: linear-gradient(135deg, rgba(255, 50, 50, 0.1), rgba(180, 0, 0, 0.1)); color: #ff5050; border: 1px solid rgba(255, 50, 50, 0.3); }
         
-        .success {
-            background: linear-gradient(135deg, rgba(0, 255, 100, 0.1), rgba(0, 180, 80, 0.1));
-            color: #00ff80;
-            border: 1px solid rgba(0, 255, 100, 0.3);
-        }
-        
-        .error {
-            background: linear-gradient(135deg, rgba(255, 50, 50, 0.1), rgba(180, 0, 0, 0.1));
-            color: #ff5050;
-            border: 1px solid rgba(255, 50, 50, 0.3);
-        }
-        
-        /* АНИМАЦИИ */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -512,12 +388,6 @@
             animation: fadeIn 0.5s ease forwards;
         }
         
-        @keyframes paperGlow {
-            0%, 100% { opacity: 0.05; }
-            50% { opacity: 0.15; }
-        }
-        
-        /* ПОДСКАЗКА */
         .hint {
             color: #8899cc;
             font-size: 14px;
@@ -526,12 +396,32 @@
             line-height: 1.5;
             max-width: 700px;
         }
+        
+        /* Эффект складки при перелистывании */
+        .page-fold {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0.02) 48%,
+                rgba(0,0,0,0.05) 50%,
+                rgba(0,0,0,0.02) 52%,
+                rgba(0,0,0,0) 100%);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+        }
+        
+        .page.turning .page-fold {
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
     <div class="header fade-in">
         <div class="logo">SMART<span>AV</span></div>
-        <p class="subtitle">Реалистичный бумажный каталог с естественным перелистыванием</p>
+        <p class="subtitle">Бумажный каталог с правильной логикой перелистывания</p>
     </div>
     
     <div class="main-container">
@@ -544,7 +434,7 @@
         </div>
         
         <div id="status" class="status loading fade-in">
-            Подготовка реалистичного перелистывания...
+            Загрузка реалистичной книги...
         </div>
         
         <div class="control-panel fade-in">
@@ -553,7 +443,7 @@
             </button>
             
             <div class="page-info">
-                <span id="current-page">1</span> / <span id="total-pages">16</span>
+                <span id="current-page">0</span> / <span id="total-pages">15</span>
             </div>
             
             <button id="next-btn" class="control-btn big-btn" disabled>
@@ -564,29 +454,27 @@
         <div class="quick-nav" id="quick-nav"></div>
         
         <div class="hint fade-in">
-            <p>• Захватите уголок страницы и потяните для реалистичного перелистывания</p>
-            <p>• Страница следует точно за курсором с эффектом тонкой бумаги</p>
-            <p>• Нажмите ⛶ для полноэкранного режима</p>
+            <p>• <strong>Страница 0</strong> (обложка) показывается одна. Потяните за правый верхний угол, чтобы открыть.</p>
+            <p>• <strong>Страницы 1-14</strong> показываются попарно (развороты).</p>
+            <p>• <strong>Страница 15</strong> (задняя обложка) показывается одна.</p>
+            <p>• Используйте уголки страниц для реалистичного перелистывания.</p>
         </div>
     </div>
 
     <script>
-        // РЕАЛИСТИЧНЫЙ КЛАСС КНИГИ С БУМАЖНОЙ ФИЗИКОЙ
-        class PaperBook {
+        // КЛАСС КНИГИ С ПРАВИЛЬНОЙ ЛОГИКОЙ
+        class RealBook {
             constructor(containerId, pages) {
                 this.container = document.getElementById(containerId);
-                this.pages = pages;
-                this.currentPage = 1;
+                this.pages = pages; // массив имен файлов [0-15]
+                this.currentView = 'cover'; // 'cover', 'spread', 'back-cover'
+                this.currentSpread = 0; // текущий разворот (0-6)
                 this.isTurning = false;
                 this.isDragging = false;
-                this.dragStart = { x: 0, y: 0 };
-                this.dragCurrent = { x: 0, y: 0 };
                 this.activePage = null;
                 this.dragDirection = 0;
                 this.pageElements = [];
                 this.isFullscreen = false;
-                this.animationFrame = null;
-                this.dragIndicator = null;
                 
                 this.init();
             }
@@ -596,10 +484,10 @@
                 this.createBookStructure();
                 this.setupEventListeners();
                 this.createQuickNavigation();
-                this.showCurrentPage();
+                this.showCurrentView();
                 this.updateControls();
                 
-                this.showStatus('success', '✓ Готово! Перетащите уголок страницы.');
+                this.showStatus('success', '✓ Готово! Книга загружена с правильной логикой.');
             }
             
             async loadImages() {
@@ -609,30 +497,29 @@
                 const promises = this.pages.map((filename, index) => {
                     return new Promise((resolve) => {
                         const img = new Image();
-                        img.onload = () => {
-                            resolve({ index, img, loaded: true });
-                            const percent = Math.round(((index + 1) / this.pages.length) * 100);
-                            status.textContent = `Загрузка изображений: ${percent}%`;
-                        };
+                        img.onload = () => resolve({ index, img, loaded: true });
                         img.onerror = () => {
-                            // Создаем заглушку
+                            // Заглушка
                             const canvas = document.createElement('canvas');
                             canvas.width = 1000;
                             canvas.height = 700;
                             const ctx = canvas.getContext('2d');
-                            ctx.fillStyle = '#f8f8f8';
+                            ctx.fillStyle = index === 0 ? '#2c3e50' : 
+                                          index === 15 ? '#34495e' : 
+                                          index % 2 === 1 ? '#f8f9fa' : '#ffffff';
                             ctx.fillRect(0, 0, 1000, 700);
-                            ctx.fillStyle = '#666';
+                            ctx.fillStyle = index === 0 || index === 15 ? '#fff' : '#333';
                             ctx.font = 'bold 40px Arial';
                             ctx.textAlign = 'center';
-                            ctx.fillText(`Страница ${index + 1}`, 500, 350);
+                            ctx.fillText(`Страница ${index}`, 500, 300);
                             ctx.font = '20px Arial';
-                            ctx.fillText('SMART-AV', 500, 400);
+                            ctx.fillText(index === 0 ? 'ОБЛОЖКА' : 
+                                       index === 15 ? 'ЗАДНЯЯ ОБЛОЖКА' : 
+                                       `Разворот ${Math.floor((index+1)/2)}`, 500, 350);
                             img.src = canvas.toDataURL();
                             resolve({ index, img, loaded: false });
                         };
                         img.src = `images/${filename}`;
-                        img.loading = "lazy";
                     });
                 });
                 
@@ -643,112 +530,76 @@
                 this.container.innerHTML = '';
                 this.pageElements = [];
                 
-                // Создаем индикатор перетаскивания
-                this.dragIndicator = document.createElement('div');
-                this.dragIndicator.className = 'drag-indicator';
-                const arrow = document.createElement('div');
-                arrow.className = 'drag-arrow';
-                arrow.textContent = '➤';
-                this.dragIndicator.appendChild(arrow);
-                this.container.appendChild(this.dragIndicator);
-                
                 // Создаем все страницы
                 for (let i = 0; i < this.pages.length; i++) {
-                    const pageNum = i + 1;
-                    const isRightPage = pageNum % 2 === 0;
-                    
                     const page = document.createElement('div');
-                    page.className = `page ${isRightPage ? 'right-page' : ''}`;
-                    page.dataset.page = pageNum;
-                    page.dataset.side = isRightPage ? 'right' : 'left';
+                    page.className = 'page';
+                    page.dataset.page = i;
                     
-                    const content = document.createElement('div');
-                    content.className = 'page-content';
+                    // Определяем тип страницы
+                    if (i === 0) {
+                        page.dataset.type = 'front-cover';
+                        page.dataset.position = 'right';
+                    } else if (i === 15) {
+                        page.dataset.type = 'back-cover';
+                        page.dataset.position = 'left';
+                    } else if (i % 2 === 1) {
+                        page.dataset.type = 'left-page';
+                        page.dataset.position = 'left';
+                    } else {
+                        page.dataset.type = 'right-page';
+                        page.dataset.position = 'right';
+                    }
                     
                     const img = document.createElement('img');
                     img.className = 'page-image';
                     img.src = `images/${this.pages[i]}`;
-                    img.alt = `Страница ${pageNum}`;
+                    img.alt = `Страница ${i}`;
                     
-                    // Эффект бумаги
-                    const paperEffect = document.createElement('div');
-                    paperEffect.className = 'page-paper-effect';
+                    // Уголки только для перелистываемых страниц
+                    if (i !== 15) { // У задней обложки нет уголка вперед
+                        const corner = document.createElement('div');
+                        corner.className = `page-corner forward`;
+                        corner.title = 'Потяните для перелистывания';
+                        corner.dataset.page = i;
+                        page.appendChild(corner);
+                        
+                        // Подсказка
+                        const hint = document.createElement('div');
+                        hint.className = 'corner-hint forward-hint';
+                        hint.textContent = 'Перелистнуть →';
+                        page.appendChild(hint);
+                    }
                     
-                    // Обратная сторона
-                    const backSide = document.createElement('div');
-                    backSide.className = 'page-back';
+                    // Уголок для перелистывания назад (только для левых страниц)
+                    if (i !== 0 && i % 2 === 1) {
+                        const cornerBack = document.createElement('div');
+                        cornerBack.className = `page-corner backward`;
+                        cornerBack.title = 'Вернуться назад';
+                        cornerBack.dataset.page = i;
+                        page.appendChild(cornerBack);
+                        
+                        const hintBack = document.createElement('div');
+                        hintBack.className = 'corner-hint backward-hint';
+                        hintBack.textContent = '← Назад';
+                        page.appendChild(hintBack);
+                    }
                     
-                    // Уголок для перелистывания
-                    const corner = document.createElement('div');
-                    corner.className = `page-corner ${isRightPage ? 'forward' : 'backward'}`;
-                    corner.title = 'Потяните для перелистывания';
-                    
-                    // Эффект кривизны
-                    const curvatureLeft = document.createElement('div');
-                    curvatureLeft.className = 'page-curvature left';
-                    
-                    const curvatureRight = document.createElement('div');
-                    curvatureRight.className = 'page-curvature right';
-                    
-                    // Тень при перелистывании
-                    const shadow = document.createElement('div');
-                    shadow.className = 'page-shadow';
+                    // Эффект складки
+                    const fold = document.createElement('div');
+                    fold.className = 'page-fold';
+                    page.appendChild(fold);
                     
                     // Номер страницы
                     const number = document.createElement('div');
-                    number.className = `page-number ${isRightPage ? 'right' : 'left'}`;
-                    number.textContent = pageNum;
-                    
-                    content.appendChild(img);
-                    content.appendChild(paperEffect);
-                    content.appendChild(backSide);
-                    
-                    page.appendChild(content);
-                    page.appendChild(corner);
-                    page.appendChild(curvatureLeft);
-                    page.appendChild(curvatureRight);
-                    page.appendChild(shadow);
+                    number.className = `page-number ${i % 2 === 0 ? 'right' : 'left'}`;
+                    number.textContent = i;
                     page.appendChild(number);
                     
+                    page.appendChild(img);
                     this.container.appendChild(page);
                     this.pageElements.push(page);
-                    
-                    // Начальная позиция
-                    this.resetPagePosition(page);
                 }
-            }
-            
-            resetPagePosition(page) {
-                const pageNum = parseInt(page.dataset.page);
-                const isRightPage = page.dataset.side === 'right';
-                
-                // Начальное положение
-                if (pageNum === 1) {
-                    // Первая страница
-                    page.style.left = '0';
-                    page.style.width = '100%';
-                    page.style.transform = 'translateX(0) rotateY(0deg)';
-                    page.style.opacity = '1';
-                    page.style.zIndex = '10';
-                } else if (isRightPage) {
-                    // Правая страница разворота
-                    page.style.left = '50%';
-                    page.style.width = '50%';
-                    page.style.transform = 'translateX(0) rotateY(0deg)';
-                    page.style.opacity = '1';
-                    page.style.zIndex = '5';
-                    page.classList.add('curved');
-                } else {
-                    // Левая страница разворота
-                    page.style.left = '0';
-                    page.style.width = '50%';
-                    page.style.transform = 'translateX(0) rotateY(0deg)';
-                    page.style.opacity = '1';
-                    page.style.zIndex = '5';
-                    page.classList.add('curved');
-                }
-                
-                page.classList.remove('show-back');
             }
             
             setupEventListeners() {
@@ -764,334 +615,246 @@
                 
                 document.getElementById('fullscreen-toggle').addEventListener('click', () => this.toggleFullscreen());
                 
-                this.setupDragEvents();
-            }
-            
-            setupDragEvents() {
+                // Обработчики для уголков
                 this.pageElements.forEach(page => {
-                    const corner = page.querySelector('.page-corner');
-                    const pageNum = parseInt(page.dataset.page);
-                    const isRightPage = page.dataset.side === 'right';
-                    
-                    corner.addEventListener('mousedown', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.startDrag(e, page, isRightPage ? 1 : -1);
+                    const corners = page.querySelectorAll('.page-corner');
+                    corners.forEach(corner => {
+                        corner.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.handleCornerClick(e, page, corner);
+                        });
+                        
+                        corner.addEventListener('touchstart', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.handleCornerClick(e, page, corner);
+                        });
                     });
-                    
-                    corner.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.startDrag(e, page, isRightPage ? 1 : -1);
-                    });
-                    
-                    corner.addEventListener('dblclick', (e) => {
-                        e.preventDefault();
-                        if (isRightPage && pageNum === this.currentPage + 1) {
-                            this.turnPage(1);
-                        } else if (!isRightPage && pageNum === this.currentPage) {
-                            this.turnPage(-1);
-                        }
-                    });
-                });
-                
-                document.addEventListener('mousemove', (e) => this.handleDrag(e));
-                document.addEventListener('touchmove', (e) => this.handleDrag(e));
-                document.addEventListener('mouseup', () => this.endDrag());
-                document.addEventListener('touchend', () => this.endDrag());
-                document.addEventListener('mouseleave', () => {
-                    if (this.isDragging) this.endDrag();
                 });
             }
             
-            startDrag(e, page, direction) {
+            handleCornerClick(e, page, corner) {
                 if (this.isTurning || this.isDragging) return;
                 
-                this.isDragging = true;
-                this.activePage = page;
-                this.dragDirection = direction;
+                const pageNum = parseInt(page.dataset.page);
+                const isForwardCorner = corner.classList.contains('forward');
                 
-                const clientX = e.clientX || e.touches[0].clientX;
-                const clientY = e.clientY || e.touches[0].clientY;
-                
-                this.dragStart.x = clientX;
-                this.dragStart.y = clientY;
-                this.dragCurrent.x = clientX;
-                this.dragCurrent.y = clientY;
-                
-                page.classList.add('active', 'turning', 'show-back');
-                page.style.transition = 'none';
-                page.style.zIndex = '1000';
-                
-                // Показываем индикатор
-                this.dragIndicator.style.left = clientX - 30 + 'px';
-                this.dragIndicator.style.top = clientY - 30 + 'px';
-                this.dragIndicator.classList.add('visible');
-                
-                // Поворачиваем стрелку
-                const arrow = this.dragIndicator.querySelector('.drag-arrow');
-                arrow.style.transform = direction === 1 ? 'rotate(180deg)' : 'rotate(0deg)';
-                arrow.style.left = direction === 1 ? '10px' : '20px';
-                
-                this.animateDrag();
-            }
-            
-            handleDrag(e) {
-                if (!this.isDragging || !this.activePage) return;
-                
-                e.preventDefault();
-                
-                const clientX = e.clientX || e.touches[0].clientX;
-                const clientY = e.clientY || e.touches[0].clientY;
-                
-                this.dragCurrent.x = clientX;
-                this.dragCurrent.y = clientY;
-                
-                // Обновляем позицию индикатора
-                if (this.dragIndicator) {
-                    this.dragIndicator.style.left = clientX - 30 + 'px';
-                    this.dragIndicator.style.top = clientY - 30 + 'px';
-                }
-            }
-            
-            animateDrag() {
-                if (!this.isDragging || !this.activePage) {
-                    if (this.animationFrame) {
-                        cancelAnimationFrame(this.animationFrame);
-                        this.animationFrame = null;
+                if (isForwardCorner) {
+                    // Перелистываем вперед
+                    if (pageNum === 0) {
+                        this.currentView = 'spread';
+                        this.currentSpread = 0;
+                    } else if (pageNum === 14) {
+                        this.currentView = 'back-cover';
+                    } else if (pageNum % 2 === 0) {
+                        // Правая страница разворота
+                        this.currentSpread = Math.floor(pageNum / 2);
                     }
-                    return;
-                }
-                
-                const deltaX = this.dragCurrent.x - this.dragStart.x;
-                const deltaY = this.dragCurrent.y - this.dragStart.y;
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                // Реалистичная физика бумаги
-                let progress = 0;
-                if (this.dragDirection === 1) {
-                    // Перелистывание вперед
-                    progress = Math.max(0, Math.min(1, -deltaX / 500));
-                    
-                    // Эффект эластичной бумаги
-                    const elastic = Math.sin(progress * Math.PI) * 0.2;
-                    const rotation = progress * 180;
-                    const bend = Math.sin(progress * Math.PI) * 20 * (1 + elastic);
-                    const twist = Math.sin(progress * Math.PI * 2) * 3;
-                    
-                    this.activePage.style.transform = `
-                        translateX(${-progress * 100}%)
-                        rotateY(${-rotation}deg)
-                        rotateZ(${twist}deg)
-                        translateZ(${bend}px)
-                    `;
                 } else {
-                    // Перелистывание назад
-                    progress = Math.max(0, Math.min(1, deltaX / 500));
-                    
-                    const elastic = Math.sin(progress * Math.PI) * 0.2;
-                    const rotation = progress * 180;
-                    const bend = Math.sin(progress * Math.PI) * 20 * (1 + elastic);
-                    const twist = Math.sin(progress * Math.PI * 2) * -3;
-                    
-                    this.activePage.style.transform = `
-                        translateX(${progress * 100}%)
-                        rotateY(${rotation}deg)
-                        rotateZ(${twist}deg)
-                        translateZ(${bend}px)
-                    `;
-                }
-                
-                // Эффект тени
-                const shadow = this.activePage.querySelector('.page-shadow');
-                if (shadow) {
-                    const intensity = Math.min(0.8, progress * 1.5);
-                    shadow.style.opacity = intensity;
-                    shadow.style.background = `radial-gradient(circle at ${this.dragDirection === 1 ? '30%' : '70%'} center, 
-                        rgba(0,0,0,0) 0%,
-                        rgba(0,0,0,${0.05 * intensity}) 30%,
-                        rgba(0,0,0,${0.1 * intensity}) 50%,
-                        rgba(0,0,0,${0.05 * intensity}) 70%,
-                        rgba(0,0,0,0) 100%)`;
-                }
-                
-                // Эффект просвета обратной стороны
-                if (progress > 0.3) {
-                    this.activePage.classList.add('show-back');
-                } else {
-                    this.activePage.classList.remove('show-back');
-                }
-                
-                this.animationFrame = requestAnimationFrame(() => this.animateDrag());
-            }
-            
-            endDrag() {
-                if (!this.isDragging || !this.activePage) return;
-                
-                this.isDragging = false;
-                
-                // Скрываем индикатор
-                if (this.dragIndicator) {
-                    this.dragIndicator.classList.remove('visible');
-                }
-                
-                if (this.animationFrame) {
-                    cancelAnimationFrame(this.animationFrame);
-                    this.animationFrame = null;
-                }
-                
-                const currentTransform = this.activePage.style.transform;
-                const match = currentTransform.match(/rotateY\(([-\d.]+)deg\)/);
-                const currentRotation = match ? parseFloat(match[1]) : 0;
-                
-                // Определяем, нужно ли перелистывать
-                const shouldTurn = Math.abs(currentRotation) > 90;
-                
-                this.activePage.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)';
-                
-                if (shouldTurn) {
-                    // Завершаем перелистывание с эффектом
-                    if (this.dragDirection === 1) {
-                        this.activePage.style.transform = 'translateX(-100%) rotateY(-180deg) rotateZ(0deg) translateZ(0px)';
-                    } else {
-                        this.activePage.style.transform = 'translateX(100%) rotateY(180deg) rotateZ(0deg) translateZ(0px)';
+                    // Перелистываем назад
+                    if (pageNum === 1) {
+                        this.currentView = 'cover';
+                    } else if (pageNum % 2 === 1) {
+                        // Левая страница разворота
+                        this.currentSpread = Math.floor((pageNum - 1) / 2) - 1;
+                        if (this.currentSpread < 0) {
+                            this.currentView = 'cover';
+                        }
                     }
-                    
-                    setTimeout(() => {
-                        this.turnPage(this.dragDirection);
-                        this.activePage.classList.remove('active', 'turning', 'show-back');
-                        this.resetPagePosition(this.activePage);
-                        this.activePage = null;
-                    }, 800);
-                } else {
-                    // Возвращаем с эффектом пружины
-                    this.activePage.style.transform = 'translateX(0) rotateY(0deg) rotateZ(0deg) translateZ(0px)';
-                    
-                    setTimeout(() => {
-                        this.activePage.classList.remove('active', 'turning', 'show-back');
-                        this.activePage.style.zIndex = '5';
-                        this.activePage = null;
-                    }, 800);
                 }
+                
+                this.animatePageTurn(isForwardCorner ? 'forward' : 'backward');
             }
             
-            async turnPage(direction) {
+            turnPage(direction) {
                 if (this.isTurning) return;
                 
-                const newPage = this.currentPage + direction;
-                if (newPage < 1 || newPage > this.pages.length) return;
+                if (direction === 1) {
+                    // Вперед
+                    if (this.currentView === 'cover') {
+                        this.currentView = 'spread';
+                        this.currentSpread = 0;
+                    } else if (this.currentView === 'spread') {
+                        if (this.currentSpread < 6) {
+                            this.currentSpread++;
+                        } else {
+                            this.currentView = 'back-cover';
+                        }
+                    }
+                } else {
+                    // Назад
+                    if (this.currentView === 'back-cover') {
+                        this.currentView = 'spread';
+                        this.currentSpread = 6;
+                    } else if (this.currentView === 'spread') {
+                        if (this.currentSpread > 0) {
+                            this.currentSpread--;
+                        } else {
+                            this.currentView = 'cover';
+                        }
+                    }
+                }
                 
-                this.isTurning = true;
-                
-                // Звук перелистывания
-                this.playPaperSound();
-                
-                // Обновляем текущую страницу
-                this.currentPage = newPage;
-                this.showCurrentPage();
-                this.updateControls();
-                
-                await new Promise(resolve => setTimeout(resolve, 400));
-                this.isTurning = false;
+                this.animatePageTurn(direction === 1 ? 'forward' : 'backward');
             }
             
-            showCurrentPage() {
-                // Сначала сбрасываем все страницы
+            animatePageTurn(direction) {
+                if (this.isTurning) return;
+                
+                this.isTurning = true;
+                this.playPaperSound();
+                
+                // Обновляем отображение
+                setTimeout(() => {
+                    this.showCurrentView();
+                    this.updateControls();
+                    this.isTurning = false;
+                }, 500);
+            }
+            
+            showCurrentView() {
+                // Скрываем все страницы
                 this.pageElements.forEach(page => {
-                    page.style.opacity = '0.3';
+                    page.style.opacity = '0';
                     page.style.pointerEvents = 'none';
+                    page.style.transform = 'translateX(0) rotateY(0deg)';
                     page.style.zIndex = '1';
-                    page.classList.remove('curved');
+                    page.style.width = '50%';
+                    page.style.left = '50%';
                 });
                 
-                // Показываем текущую страницу
-                const currentPageElem = this.pageElements.find(p => 
-                    parseInt(p.dataset.page) === this.currentPage
-                );
-                
-                if (currentPageElem) {
-                    currentPageElem.style.opacity = '1';
-                    currentPageElem.style.pointerEvents = 'auto';
-                    currentPageElem.style.zIndex = '10';
+                if (this.currentView === 'cover') {
+                    // Показываем только обложку
+                    const cover = this.pageElements[0];
+                    cover.style.opacity = '1';
+                    cover.style.pointerEvents = 'auto';
+                    cover.style.zIndex = '10';
+                    cover.style.width = '100%';
+                    cover.style.left = '0';
                     
-                    // Для страниц 2+ добавляем эффект кривизны
-                    if (this.currentPage > 1) {
-                        currentPageElem.classList.add('curved');
-                    }
-                }
-                
-                // Показываем следующую страницу для разворота
-                if (this.currentPage < this.pages.length) {
-                    const nextPageElem = this.pageElements.find(p => 
-                        parseInt(p.dataset.page) === this.currentPage + 1
-                    );
+                    // Обновляем активную кнопку
+                    this.updateQuickNav(0);
                     
-                    if (nextPageElem) {
-                        nextPageElem.style.opacity = '1';
-                        nextPageElem.style.pointerEvents = 'auto';
-                        nextPageElem.style.zIndex = '5';
-                        nextPageElem.classList.add('curved');
-                    }
+                } else if (this.currentView === 'spread') {
+                    // Показываем текущий разворот
+                    const leftPageIndex = this.currentSpread * 2 + 1;
+                    const rightPageIndex = leftPageIndex + 1;
+                    
+                    // Левая страница
+                    const leftPage = this.pageElements[leftPageIndex];
+                    leftPage.style.opacity = '1';
+                    leftPage.style.pointerEvents = 'auto';
+                    leftPage.style.zIndex = '5';
+                    leftPage.style.width = '50%';
+                    leftPage.style.left = '0';
+                    
+                    // Правая страница
+                    const rightPage = this.pageElements[rightPageIndex];
+                    rightPage.style.opacity = '1';
+                    rightPage.style.pointerEvents = 'auto';
+                    rightPage.style.zIndex = '5';
+                    rightPage.style.width = '50%';
+                    rightPage.style.left = '50%';
+                    
+                    // Обновляем активную кнопку
+                    this.updateQuickNav(leftPageIndex);
+                    
+                } else if (this.currentView === 'back-cover') {
+                    // Показываем заднюю обложку
+                    const backCover = this.pageElements[15];
+                    backCover.style.opacity = '1';
+                    backCover.style.pointerEvents = 'auto';
+                    backCover.style.zIndex = '10';
+                    backCover.style.width = '100%';
+                    backCover.style.left = '0';
+                    
+                    // Обновляем активную кнопку
+                    this.updateQuickNav(15);
                 }
+            }
+            
+            updateControls() {
+                let currentPage = 0;
+                if (this.currentView === 'cover') currentPage = 0;
+                else if (this.currentView === 'spread') currentPage = this.currentSpread * 2 + 1;
+                else if (this.currentView === 'back-cover') currentPage = 15;
                 
-                // Обновляем активную кнопку быстрой навигации
+                document.getElementById('current-page').textContent = currentPage;
+                document.getElementById('total-pages').textContent = 15;
+                
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                prevBtn.disabled = (this.currentView === 'cover') || this.isTurning;
+                nextBtn.disabled = (this.currentView === 'back-cover') || this.isTurning;
+            }
+            
+            createQuickNavigation() {
+                const quickNav = document.getElementById('quick-nav');
+                quickNav.innerHTML = '';
+                
+                // Кнопки для быстрого перехода
+                const pages = [
+                    { num: 0, label: 'Обложка' },
+                    { num: 1, label: '1-2' },
+                    { num: 3, label: '3-4' },
+                    { num: 5, label: '5-6' },
+                    { num: 7, label: '7-8' },
+                    { num: 9, label: '9-10' },
+                    { num: 11, label: '11-12' },
+                    { num: 13, label: '13-14' },
+                    { num: 15, label: 'Задняя' }
+                ];
+                
+                pages.forEach(page => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quick-btn';
+                    btn.textContent = page.label;
+                    btn.dataset.page = page.num;
+                    btn.addEventListener('click', () => this.goToPage(page.num));
+                    quickNav.appendChild(btn);
+                });
+            }
+            
+            updateQuickNav(activePage) {
                 document.querySelectorAll('.quick-btn').forEach(btn => {
                     btn.classList.remove('active');
-                    if (parseInt(btn.dataset.page) === this.currentPage) {
+                    if (parseInt(btn.dataset.page) === activePage) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '1' && (activePage === 1 || activePage === 2)) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '3' && (activePage === 3 || activePage === 4)) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '5' && (activePage === 5 || activePage === 6)) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '7' && (activePage === 7 || activePage === 8)) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '9' && (activePage === 9 || activePage === 10)) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '11' && (activePage === 11 || activePage === 12)) {
+                        btn.classList.add('active');
+                    } else if (btn.dataset.page === '13' && (activePage === 13 || activePage === 14)) {
                         btn.classList.add('active');
                     }
                 });
             }
             
-            updateControls() {
-                document.getElementById('current-page').textContent = this.currentPage;
-                document.getElementById('total-pages').textContent = this.pages.length;
-                
-                const prevBtn = document.getElementById('prev-btn');
-                const nextBtn = document.getElementById('next-btn');
-                
-                prevBtn.disabled = this.currentPage <= 1 || this.isTurning || this.isDragging;
-                nextBtn.disabled = this.currentPage >= this.pages.length || this.isTurning || this.isDragging;
-            }
-            
-            createQuickNavigation() {
-                const quickNav = document.getElementById('quick-nav');
-                
-                for (let i = 1; i <= this.pages.length; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = 'quick-btn';
-                    btn.textContent = i;
-                    btn.dataset.page = i;
-                    btn.addEventListener('click', () => this.goToPage(i));
-                    quickNav.appendChild(btn);
-                }
-            }
-            
             goToPage(targetPage) {
-                if (targetPage < 1 || targetPage > this.pages.length || 
-                    this.isTurning || this.isDragging) return;
+                if (this.isTurning) return;
                 
-                // Анимированный переход
-                const direction = targetPage > this.currentPage ? 1 : -1;
-                const steps = Math.abs(targetPage - this.currentPage);
+                if (targetPage === 0) {
+                    this.currentView = 'cover';
+                } else if (targetPage === 15) {
+                    this.currentView = 'back-cover';
+                } else {
+                    this.currentView = 'spread';
+                    this.currentSpread = Math.floor((targetPage - 1) / 2);
+                }
                 
-                const animateStep = (step) => {
-                    if (step >= steps) {
-                        this.currentPage = targetPage;
-                        this.showCurrentPage();
-                        this.updateControls();
-                        return;
-                    }
-                    
-                    this.currentPage += direction;
-                    this.showCurrentPage();
-                    this.updateControls();
-                    this.playPaperSound();
-                    
-                    setTimeout(() => animateStep(step + 1), 200);
-                };
-                
-                animateStep(0);
+                this.playPaperSound();
+                this.showCurrentView();
+                this.updateControls();
             }
             
             toggleFullscreen() {
@@ -1100,42 +863,33 @@
                 if (this.isFullscreen) {
                     document.body.classList.add('fullscreen');
                     document.getElementById('fullscreen-icon').textContent = '✕';
-                    if (!document.fullscreenElement) {
-                        document.documentElement.requestFullscreen?.();
-                    }
+                    document.documentElement.requestFullscreen?.();
                 } else {
                     document.body.classList.remove('fullscreen');
                     document.getElementById('fullscreen-icon').textContent = '⛶';
-                    if (document.fullscreenElement) {
-                        document.exitFullscreen?.();
-                    }
+                    document.exitFullscreen?.();
                 }
             }
             
             playPaperSound() {
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
                     
-                    for (let i = 0; i < 3; i++) {
-                        setTimeout(() => {
-                            const oscillator = audioContext.createOscillator();
-                            const gainNode = audioContext.createGain();
-                            
-                            oscillator.connect(gainNode);
-                            gainNode.connect(audioContext.destination);
-                            
-                            oscillator.frequency.value = 50 + Math.random() * 60;
-                            oscillator.type = 'triangle';
-                            
-                            gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
-                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-                            
-                            oscillator.start(audioContext.currentTime);
-                            oscillator.stop(audioContext.currentTime + 0.3);
-                        }, i * 25);
-                    }
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 80 + Math.random() * 40;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.015, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
                 } catch (e) {
-                    // Игнорируем ошибки аудио
+                    // Игнорируем
                 }
             }
             
@@ -1157,28 +911,28 @@
         }
         
         // ЗАПУСК КНИГИ
-        window.addEventListener('load', async () => {
+        window.addEventListener('load', () => {
             const imageFiles = [
-                'SMART-AV_company0.jpg',
-                'SMART-AV_company1.jpg',
-                'SMART-AV_company2.jpg',
-                'SMART-AV_company3.jpg',
-                'SMART-AV_company4.jpg',
-                'SMART-AV_company5.jpg',
-                'SMART-AV_company6.jpg',
-                'SMART-AV_company7.jpg',
-                'SMART-AV_company8.jpg',
-                'SMART-AV_company9.jpg',
-                'SMART-AV_company10.jpg',
-                'SMART-AV_company11.jpg',
-                'SMART-AV_company12.jpg',
-                'SMART-AV_company13.jpg',
-                'SMART-AV_company14.jpg',
-                'SMART-AV_company15.jpg'
+                'SMART-AV_company0.jpg',   // 0 - Обложка
+                'SMART-AV_company1.jpg',   // 1 - Левая страница разворота 1
+                'SMART-AV_company2.jpg',   // 2 - Правая страница разворота 1
+                'SMART-AV_company3.jpg',   // 3 - Левая страница разворота 2
+                'SMART-AV_company4.jpg',   // 4 - Правая страница разворота 2
+                'SMART-AV_company5.jpg',   // 5 - Левая страница разворота 3
+                'SMART-AV_company6.jpg',   // 6 - Правая страница разворота 3
+                'SMART-AV_company7.jpg',   // 7 - Левая страница разворота 4
+                'SMART-AV_company8.jpg',   // 8 - Правая страница разворота 4
+                'SMART-AV_company9.jpg',   // 9 - Левая страница разворота 5
+                'SMART-AV_company10.jpg',  // 10 - Правая страница разворота 5
+                'SMART-AV_company11.jpg',  // 11 - Левая страница разворота 6
+                'SMART-AV_company12.jpg',  // 12 - Правая страница разворота 6
+                'SMART-AV_company13.jpg',  // 13 - Левая страница разворота 7
+                'SMART-AV_company14.jpg',  // 14 - Правая страница разворота 7
+                'SMART-AV_company15.jpg'   // 15 - Задняя обложка
             ];
             
             try {
-                window.book = new PaperBook('book', imageFiles);
+                window.book = new RealBook('book', imageFiles);
             } catch (error) {
                 const status = document.getElementById('status');
                 status.className = 'status error fade-in';
@@ -1192,12 +946,6 @@
                 document.body.classList.remove('fullscreen');
                 document.getElementById('fullscreen-icon').textContent = '⛶';
                 if (window.book) window.book.isFullscreen = false;
-            }
-        });
-        
-        document.addEventListener('selectstart', (e) => {
-            if (window.book?.isDragging) {
-                e.preventDefault();
             }
         });
     </script>
