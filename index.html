@@ -4,242 +4,391 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMART-AV Каталог</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.css">
+    <!-- Правильные ссылки на библиотеки -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.1/turn.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
         body { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2c3e50;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             padding: 20px;
         }
+        
         .container {
-            text-align: center;
             width: 100%;
             max-width: 1200px;
+            text-align: center;
         }
-        h1 { 
-            color: white; 
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        .subtitle {
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 30px;
+        
+        .logo span {
+            color: #3498db;
         }
-        .book-wrapper {
-            width: 100%;
-            height: 600px;
-            margin: 0 auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            border-radius: 10px;
-            overflow: hidden;
-            background: white;
+        
+        .tagline {
+            color: #ecf0f1;
+            font-size: 18px;
+            opacity: 0.9;
         }
-        .page { background: white; }
-        .page img {
+        
+        /* Контейнер книги - ПОДСТАВЬТЕ СВОЙ РАЗМЕР! */
+        .book-container {
+            width: 1000px;    /* ← ИЗМЕНИТЕ НА ШИРИНУ ВАШИХ КАРТИНОК */
+            height: 700px;    /* ← ИЗМЕНИТЕ НА ВЫСОТУ ВАШИХ КАРТИНОК */
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        
+        /* Для адаптивности */
+        @media (max-width: 1100px) {
+            .book-container {
+                width: 90vw;
+                height: calc(90vw * 0.7); /* Сохраняем пропорции */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .book-container {
+                width: 95vw;
+                height: calc(95vw * 0.7);
+            }
+            .logo { font-size: 28px; }
+        }
+        
+        #flipbook {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            display: block;
+            background: white;
         }
+        
+        .page {
+            background-color: white;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
         .controls {
-            margin-top: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
         }
-        button {
-            padding: 10px 25px;
-            background: white;
-            color: #764ba2;
+        
+        .control-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
             border: none;
             border-radius: 25px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        button:hover {
+        
+        .control-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
+        
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
         .page-info {
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             min-width: 120px;
+            font-weight: 500;
         }
-        .hint {
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
+        
+        .hints {
+            margin-top: 20px;
+            color: #bdc3c7;
             font-size: 14px;
+            line-height: 1.6;
         }
+        
+        .loading {
+            color: white;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        
         .error {
-            color: #ff6b6b;
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: 8px;
             margin-top: 20px;
             display: none;
+            border-left: 4px solid #e74c3c;
         }
-        @media (max-width: 768px) {
-            .book-wrapper { height: 500px; }
-            h1 { font-size: 24px; }
-        }
-        @media (max-width: 480px) {
-            .book-wrapper { height: 400px; }
-            .controls { flex-direction: column; gap: 10px; }
+        
+        .success {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #2ecc71;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>SMART-AV</h1>
-        <p class="subtitle">Каталог решений</p>
+        <div class="header">
+            <div class="logo">SMART<span>AV</span></div>
+            <p class="tagline">Интегратор мультимедиа решений</p>
+        </div>
         
-        <div class="book-wrapper">
+        <div class="book-container">
             <div id="flipbook"></div>
         </div>
         
-        <div class="controls">
-            <button id="prev-btn">◀ Назад</button>
-            <div class="page-info">Страница: <span id="current-page">1</span>/<span id="total-pages">16</span></div>
-            <button id="next-btn">Вперед ▶</button>
+        <div id="loading" class="loading">Загрузка каталога...</div>
+        
+        <div id="success" class="success">
+            ✓ Каталог загружен успешно! Используйте кнопки или кликайте по страницам.
         </div>
         
-        <p class="hint">Кликните по уголку страницы • Используйте клавиши ← →</p>
+        <div id="error" class="error">
+            ✗ Ошибка загрузки. Проверьте подключение к интернету.
+        </div>
         
-        <div id="error-message" class="error"></div>
+        <div class="controls">
+            <button id="prev-btn" class="control-btn" disabled>
+                <span>◀</span> Назад
+            </button>
+            
+            <div class="page-info">
+                <span id="current-page">1</span> из <span id="total-pages">16</span>
+            </div>
+            
+            <button id="next-btn" class="control-btn" disabled>
+                Вперед <span>▶</span>
+            </button>
+        </div>
+        
+        <div class="hints">
+            <p>• Кликните по правому/левому краю страницы для перелистывания</p>
+            <p>• Используйте клавиши ← → на клавиатуре</p>
+        </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
+    <!-- Загрузка библиотек в правильном порядке -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
-        $(document).ready(function() {
-            console.log("Страница загружается...");
+        // Проверяем загрузку jQuery
+        if (!window.jQuery) {
+            document.write('<script src="https://code.jquery.com/jquery-3.6.4.min.js"><\/script>');
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.1/turn.min.js"></script>
+    
+    <script>
+        // Ждем загрузки всех библиотек
+        function initBook() {
+            console.log("jQuery loaded:", !!window.jQuery);
+            console.log("Turn.js loaded:", !!window.turn);
             
-            // СПИСОК ФАЙЛОВ - ТОЧНО ТАК КАК НА GITHUB
-            const imageFiles = [
-                'SMART-AV_company0.jpg',
-                'SMART-AV_company1.jpg', 
-                'SMART-AV_company2.jpg',
-                'SMART-AV_company3.jpg',
-                'SMART-AV_company4.jpg',
-                'SMART-AV_company5.jpg',
-                'SMART-AV_company6.jpg',
-                'SMART-AV_company7.jpg',
-                'SMART-AV_company8.jpg',
-                'SMART-AV_company9.jpg',
-                'SMART-AV_company10.jpg',
-                'SMART-AV_company11.jpg',
-                'SMART-AV_company12.jpg',
-                'SMART-AV_company13.jpg',
-                'SMART-AV_company14.jpg',
-                'SMART-AV_company15.jpg'
-            ];
-            
-            // Проверяем доступность файлов
-            function checkImages() {
-                let loaded = 0;
-                const total = imageFiles.length;
-                
-                imageFiles.forEach((file, index) => {
-                    const img = new Image();
-                    img.onload = function() {
-                        loaded++;
-                        console.log(`✓ ${file} загружен`);
-                        if (loaded === total) {
-                            console.log("Все изображения загружены!");
-                            createBook();
-                        }
-                    };
-                    img.onerror = function() {
-                        console.error(`✗ Ошибка загрузки: ${file}`);
-                        $('#error-message').html(
-                            `Ошибка: файл ${file} не найден!<br>
-                             Проверьте: https://smartolc49-cloud.github.io/smart-av-catalog/images/${file}`
-                        ).show();
-                    };
-                    img.src = `images/${file}?t=${Date.now()}`;
-                });
+            if (!window.jQuery || !window.turn) {
+                document.getElementById('error').innerHTML = 
+                    '✗ Библиотеки не загрузились. Обновите страницу (F5).';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                return;
             }
             
-            // Создаем книгу
-            function createBook() {
-                console.log("Создаем книгу...");
+            // Теперь безопасно используем jQuery
+            $(document).ready(function() {
+                console.log("Документ готов, начинаем инициализацию...");
+                
+                // СПИСОК ВАШИХ ФАЙЛОВ
+                const imageFiles = [
+                    'SMART-AV_company0.jpg',   // Страница 1
+                    'SMART-AV_company1.jpg',   // Страница 2
+                    'SMART-AV_company2.jpg',   // Страница 3
+                    'SMART-AV_company3.jpg',   // Страница 4
+                    'SMART-AV_company4.jpg',   // Страница 5
+                    'SMART-AV_company6.jpg',   // Страница 6
+                    'SMART-AV_company7.jpg',   // Страница 7
+                    'SMART-AV_company8.jpg',   // Страница 8
+                    'SMART-AV_company9.jpg',   // Страница 9
+                    'SMART-AV_company10.jpg',  // Страница 10
+                    'SMART-AV_company11.jpg',  // Страница 11
+                    'SMART-AV_company12.jpg',  // Страница 12
+                    'SMART-AV_company13.jpg',  // Страница 13
+                    'SMART-AV_company14.jpg',  // Страница 14
+                    'SMART-AV_company15.jpg',  // Страница 15
+                    'SMART-AV_company5.jpg'    // Страница 16 - проверьте порядок!
+                ];
+                
+                // Создаем страницы
                 const flipbook = $('#flipbook');
                 
-                // Очищаем, если что-то есть
-                flipbook.empty();
-                
-                // Добавляем страницы
-                imageFiles.forEach((file, index) => {
+                imageFiles.forEach((filename, index) => {
                     const pageNum = index + 1;
                     flipbook.append(`
-                        <div class="page">
-                            <img src="images/${file}" 
-                                 alt="Страница ${pageNum}"
-                                 onerror="this.src='https://via.placeholder.com/800x600/ccc/333?text=Страница+${pageNum}'">
+                        <div class="page" style="background-image: url('images/${filename}');">
+                            <!-- Фон загрузится как background-image -->
                         </div>
                     `);
                 });
                 
-                // Инициализируем Turn.js
-                try {
-                    flipbook.turn({
-                        width: '100%',
-                        height: '100%',
-                        autoCenter: true,
-                        duration: 700,
-                        when: {
-                            turned: function(e, page) {
-                                $('#current-page').text(page);
+                // Узнаем размеры первой картинки для настройки книги
+                const testImage = new Image();
+                testImage.onload = function() {
+                    console.log("Размер картинки:", this.width, "x", this.height);
+                    
+                    // Настраиваем размер книги ПОД ВАШИ КАРТИНКИ
+                    const bookWidth = Math.min(1000, this.width);
+                    const bookHeight = Math.min(700, this.height);
+                    
+                    // Обновляем CSS если нужно
+                    if (this.width > 1000 || this.height > 700) {
+                        document.querySelector('.book-container').style.width = bookWidth + 'px';
+                        document.querySelector('.book-container').style.height = bookHeight + 'px';
+                    }
+                    
+                    // Инициализируем Turn.js
+                    try {
+                        flipbook.turn({
+                            width: bookWidth,
+                            height: bookHeight,
+                            autoCenter: true,
+                            elevation: 50,
+                            gradients: true,
+                            duration: 600,
+                            when: {
+                                turned: function(e, page) {
+                                    $('#current-page').text(page);
+                                    $('#prev-btn').prop('disabled', page === 1);
+                                    $('#next-btn').prop('disabled', page === imageFiles.length);
+                                }
                             }
-                        }
-                    });
-                    
-                    console.log("Книга создана успешно!");
-                    
-                    // Кнопки управления
-                    $('#prev-btn').click(() => flipbook.turn('previous'));
-                    $('#next-btn').click(() => flipbook.turn('next'));
-                    
-                    // Клавиатура
-                    $(document).keydown(function(e) {
-                        if (e.keyCode === 37) flipbook.turn('previous');
-                        if (e.keyCode === 39) flipbook.turn('next');
-                    });
-                    
-                    $('#total-pages').text(imageFiles.length);
-                    
-                } catch (error) {
-                    console.error("Ошибка Turn.js:", error);
-                    $('#error-message').html(
-                        `Ошибка инициализации книги: ${error.message}<br>
-                         Проверьте подключение библиотек.`
-                    ).show();
+                        });
+                        
+                        // Успех!
+                        $('#loading').hide();
+                        $('#success').show();
+                        $('#prev-btn, #next-btn').prop('disabled', false);
+                        $('#total-pages').text(imageFiles.length);
+                        
+                        console.log("✓ Книга успешно создана!");
+                        
+                    } catch (err) {
+                        console.error("Ошибка Turn.js:", err);
+                        $('#loading').hide();
+                        $('#error').html('✗ Ошибка создания книги: ' + err.message).show();
+                    }
+                };
+                
+                testImage.onerror = function() {
+                    console.error("Не удалось загрузить тестовую картинку");
+                    // Продолжаем с дефолтными размерами
+                    initFlipbookWithDefaultSize();
+                };
+                
+                testImage.src = 'images/' + imageFiles[0] + '?t=' + Date.now();
+                
+                function initFlipbookWithDefaultSize() {
+                    try {
+                        flipbook.turn({
+                            width: 1000,
+                            height: 700,
+                            autoCenter: true,
+                            duration: 600
+                        });
+                        
+                        $('#loading').hide();
+                        $('#success').show();
+                        $('#prev-btn, #next-btn').prop('disabled', false);
+                        $('#total-pages').text(imageFiles.length);
+                        
+                    } catch (err) {
+                        $('#loading').hide();
+                        $('#error').html('✗ Критическая ошибка: ' + err.message).show();
+                    }
                 }
+                
+                // Обработчики кнопок
+                $('#prev-btn').click(function() {
+                    if (!$(this).prop('disabled')) {
+                        flipbook.turn('previous');
+                    }
+                });
+                
+                $('#next-btn').click(function() {
+                    if (!$(this).prop('disabled')) {
+                        flipbook.turn('next');
+                    }
+                });
+                
+                // Управление клавиатурой
+                $(document).keydown(function(e) {
+                    if (e.keyCode === 37) { // Стрелка влево
+                        flipbook.turn('previous');
+                        e.preventDefault();
+                    }
+                    if (e.keyCode === 39) { // Стрелка вправо
+                        flipbook.turn('next');
+                        e.preventDefault();
+                    }
+                });
+                
+                // Клик по страницам
+                $(document).on('click', '.page', function(e) {
+                    const pageWidth = $(this).width();
+                    const clickX = e.offsetX;
+                    
+                    if (clickX > pageWidth * 0.7) { // Клик в правой трети
+                        flipbook.turn('next');
+                    } else if (clickX < pageWidth * 0.3) { // Клик в левой трети
+                        flipbook.turn('previous');
+                    }
+                });
+            });
+        }
+        
+        // Запускаем когда всё загрузится
+        window.addEventListener('load', initBook);
+        
+        // Резервный таймер
+        setTimeout(function() {
+            if (document.getElementById('loading').style.display !== 'none') {
+                document.getElementById('loading').innerHTML = 'Долгая загрузка... Проверьте файлы.';
             }
-            
-            // Запускаем проверку
-            checkImages();
-            
-            // Если через 5 секунд ничего не произошло
-            setTimeout(() => {
-                if ($('#flipbook').children().length === 0) {
-                    $('#error-message').html(
-                        `Проверьте:<br>
-                         1. Файлы в папке images/<br>
-                         2. Права доступа<br>
-                         3. Консоль браузера (F12)`
-                    ).show();
-                }
-            }, 5000);
-        });
+        }, 10000);
     </script>
 </body>
 </html>
