@@ -3,126 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART-AV | Каталог решений ProAV</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>SMART-AV | Каталог</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .book-container {
+            width: 100%;
+            height: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .page {
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .simple-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .page-info {
+            font-size: 16px;
+            color: #333;
+            min-width: 100px;
+        }
+        
+        .nav-btn {
+            padding: 8px 20px;
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: #3a5a8a;
+        }
+        
+        .hint {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .book-container {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .book-container {
+                height: 400px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="loader">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>Загрузка каталога SMART-AV...</p>
-        </div>
-    </div>
-
     <div class="container">
-        <header class="header">
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-video"></i>
-                    <span>SMART<span class="logo-accent">AV</span></span>
-                </div>
-                <p class="tagline">Интегратор мультимедиа решений</p>
-            </div>
-            
-            <div class="controls-info">
-                <div class="control-hint">
-                    <i class="fas fa-mouse-pointer"></i>
-                    <span>Кликните по уголку страницы</span>
-                </div>
-                <div class="control-hint">
-                    <i class="fas fa-keyboard"></i>
-                    <span>Используйте ← → на клавиатуре</span>
-                </div>
-            </div>
-        </header>
-
-        <div class="book-wrapper">
-            <div class="flipbook-container" id="flipbook-container">
-                <div id="flipbook"></div>
+        <h1>SMART-AV</h1>
+        <p class="subtitle">Каталог решений</p>
+        
+        <div class="book-container">
+            <div id="flipbook">
+                <!-- Страницы добавятся автоматически -->
             </div>
         </div>
-
-        <div class="controls-panel">
-            <button id="prev-btn" class="control-btn">
-                <i class="fas fa-chevron-left"></i>
-                <span>Назад</span>
-            </button>
-            
+        
+        <div class="simple-controls">
+            <button id="prev-btn" class="nav-btn">◀ Назад</button>
             <div class="page-info">
-                <span id="current-page">1</span>
-                <span class="separator">из</span>
-                <span id="total-pages">16</span>
+                Страница: <span id="current-page">1</span> из <span id="total-pages">16</span>
             </div>
-            
-            <button id="next-btn" class="control-btn">
-                <span>Вперед</span>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            
-            <div class="extra-controls">
-                <button id="zoom-in" class="icon-btn" title="Увеличить">
-                    <i class="fas fa-search-plus"></i>
-                </button>
-                <button id="zoom-out" class="icon-btn" title="Уменьшить">
-                    <i class="fas fa-search-minus"></i>
-                </button>
-                <button id="fullscreen" class="icon-btn" title="Полный экран">
-                    <i class="fas fa-expand"></i>
-                </button>
-            </div>
+            <button id="next-btn" class="nav-btn">Вперед ▶</button>
         </div>
-
-        <div class="quick-nav">
-            <h3><i class="fas fa-bookmark"></i> Быстрый переход:</h3>
-            <div class="nav-buttons">
-                <button data-page="1" class="nav-btn">Обложка</button>
-                <button data-page="3" class="nav-btn">Услуги</button>
-                <button data-page="4" class="nav-btn">Проекты</button>
-                <button data-page="13" class="nav-btn">Цифры</button>
-                <button data-page="15" class="nav-btn">Преимущества</button>
-                <button data-page="16" class="nav-btn">Контакты</button>
-            </div>
-        </div>
-
-        <div class="sound-control">
-            <button id="sound-toggle" class="sound-btn">
-                <i class="fas fa-volume-up"></i>
-                <span>Звук: Вкл</span>
-            </button>
-        </div>
-
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="contact-info">
-                    <h4><i class="fas fa-phone-alt"></i> Контакты</h4>
-                    <p>+7 (495) 481-29-92</p>
-                    <p>8 (800) 777-78-92</p>
-                    <p>sales@smart-av.ru</p>
-                </div>
-                <div class="address">
-                    <h4><i class="fas fa-map-marker-alt"></i> Адрес</h4>
-                    <p>г. Москва, ул. Новоостаповская, д. 5, стр. 14, 6 этаж</p>
-                </div>
-                <div class="social">
-                    <h4><i class="fas fa-share-alt"></i> Соцсети</h4>
-                    <a href="https://vk.com/smartavvks" target="_blank" class="social-link">
-                        <i class="fab fa-vk"></i> VK
-                    </a>
-                    <a href="http://www.smart-av.ru" target="_blank" class="social-link">
-                        <i class="fas fa-globe"></i> Сайт
-                    </a>
-                </div>
-            </div>
-            <p class="copyright">© 2024 SMART-AV. Все права защищены.</p>
-        </footer>
+        
+        <p class="hint">
+            Кликните по уголку страницы для перелистывания • Используйте клавиши ← →
+        </p>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Создаем 16 страниц
+            const flipbook = $('#flipbook');
+            for (let i = 1; i <= 16; i++) {
+                flipbook.append(`
+                    <div class="page">
+                        <img src="images/page${i}.jpg" alt="Страница ${i}">
+                    </div>
+                `);
+            }
+            
+            // Инициализируем книгу
+            flipbook.turn({
+                width: '100%',
+                height: '100%',
+                autoCenter: true,
+                duration: 600,
+                acceleration: true,
+                gradients: true
+            });
+            
+            // Обновляем номер страницы
+            flipbook.bind('turned', function(e, page) {
+                $('#current-page').text(page);
+            });
+            
+            // Кнопки управления
+            $('#prev-btn').click(function() {
+                flipbook.turn('previous');
+            });
+            
+            $('#next-btn').click(function() {
+                flipbook.turn('next');
+            });
+            
+            // Управление с клавиатуры
+            $(document).keydown(function(e) {
+                if (e.keyCode === 37) { // Стрелка влево
+                    flipbook.turn('previous');
+                    e.preventDefault();
+                }
+                if (e.keyCode === 39) { // Стрелка вправо
+                    flipbook.turn('next');
+                    e.preventDefault();
+                }
+            });
+            
+            $('#total-pages').text('16');
+        });
+    </script>
 </body>
 </html>
