@@ -12,165 +12,255 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
+            overflow-x: hidden;
             padding: 20px;
+            transition: background 0.5s;
+        }
+        
+        body.fullscreen {
+            padding: 0;
+            background: #000;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             width: 100%;
+            max-width: 1200px;
+            transition: all 0.3s;
+        }
+        
+        body.fullscreen .header {
+            opacity: 0;
+            pointer-events: none;
+            height: 0;
+            margin: 0;
         }
         
         .logo {
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 800;
             color: white;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+            text-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            letter-spacing: 1px;
         }
         
         .logo span {
             color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
         }
         
         .subtitle {
-            color: #a0a0ff;
+            color: #a0b0ff;
             font-size: 18px;
             opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        /* ОСНОВНОЙ КОНТЕЙНЕР */
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
         
         /* КОНТЕЙНЕР КНИГИ */
-        .book-container {
-            width: 900px;
-            height: 630px;
-            margin: 20px auto 40px;
+        .book-wrapper {
+            width: 1000px;
+            height: 700px;
             position: relative;
-            perspective: 2000px;
-            transform-style: preserve-3d;
+            perspective: 2500px;
+            margin-bottom: 30px;
+            transition: all 0.5s ease;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
         }
         
-        @media (max-width: 1000px) {
-            .book-container {
+        body.fullscreen .book-wrapper {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            border-radius: 0;
+            margin: 0;
+            box-shadow: none;
+        }
+        
+        @media (max-width: 1100px) {
+            .book-wrapper {
                 width: 90vw;
                 height: calc(90vw * 0.7);
             }
         }
         
-        @media (max-width: 600px) {
-            .book-container {
+        @media (max-width: 768px) {
+            .book-wrapper {
                 width: 95vw;
                 height: calc(95vw * 0.7);
             }
-            .logo { font-size: 36px; }
+            .logo { font-size: 42px; }
+        }
+        
+        /* КНИГА */
+        #book {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: translateZ(-1px);
         }
         
         /* СТРАНИЦЫ */
         .page {
             position: absolute;
-            width: 100%;
+            width: 50%;
             height: 100%;
             top: 0;
-            left: 0;
             background: white;
             transform-origin: left center;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
-            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-            border-radius: 2px;
+            transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.1),
+                0 5px 30px rgba(0,0,0,0.2);
             overflow: hidden;
+            border-radius: 1px;
         }
         
-        /* ПРАВАЯ СТРАНИЦА (четные номера) */
+        /* ПРАВАЯ СТРАНИЦА */
         .page.right {
+            left: 50%;
             transform-origin: left center;
         }
         
-        /* ЛЕВАЯ СТРАНИЦА (нечетные номера) */
+        /* ЛЕВАЯ СТРАНИЦА */
         .page.left {
+            left: 0;
             transform-origin: right center;
         }
         
-        /* ИЗОБРАЖЕНИЕ СТРАНИЦЫ */
+        /* ИЗОБРАЖЕНИЕ */
         .page-image {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            display: block;
             pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
         }
         
-        /* УГОЛОК ДЛЯ ПЕРЕТАСКИВАНИЯ */
+        /* УГОЛКИ ДЛЯ ПЕРЕТАСКИВАНИЯ */
         .page-corner {
             position: absolute;
-            width: 80px;
-            height: 80px;
-            cursor: pointer;
-            z-index: 10;
+            width: 120px;
+            height: 120px;
+            cursor: grab;
+            z-index: 100;
+            transition: background 0.3s;
         }
         
         .page.right .page-corner {
             top: 0;
             right: 0;
-            background: linear-gradient(225deg, transparent 50%, rgba(0, 212, 255, 0.15) 50%);
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 212, 255, 0.1) 50%);
         }
         
         .page.right .page-corner:hover {
-            background: linear-gradient(225deg, transparent 50%, rgba(0, 212, 255, 0.3) 50%);
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 212, 255, 0.25) 50%);
         }
         
         .page.left .page-corner {
             top: 0;
             left: 0;
-            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.15) 50%);
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.1) 50%);
         }
         
         .page.left .page-corner:hover {
-            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.3) 50%);
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.25) 50%);
         }
         
         /* НОМЕР СТРАНИЦЫ */
         .page-number {
             position: absolute;
-            bottom: 15px;
-            background: rgba(0,0,0,0.7);
+            bottom: 20px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 15px;
             font-weight: 500;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .page.right .page-number {
-            right: 15px;
+            right: 20px;
         }
         
         .page.left .page-number {
-            left: 15px;
+            left: 20px;
         }
         
-        /* УПРАВЛЕНИЕ */
-        .controls {
+        /* ПАНЕЛЬ УПРАВЛЕНИЯ */
+        .control-panel {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 40px;
+            gap: 50px;
             margin: 30px 0;
-            flex-wrap: wrap;
+            padding: 20px 40px;
+            background: rgba(0, 20, 40, 0.7);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1000;
+        }
+        
+        body.fullscreen .control-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        
+        /* БОЛЬШИЕ КНОПКИ */
+        .big-btn {
+            padding: 18px 50px !important;
+            font-size: 22px !important;
+            min-width: 180px !important;
+            height: 70px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 15px !important;
         }
         
         .control-btn {
-            padding: 14px 40px;
-            background: linear-gradient(135deg, #00d4ff, #0088ff);
+            padding: 16px 45px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
             color: white;
             border: none;
-            border-radius: 30px;
-            font-size: 18px;
+            border-radius: 35px;
+            font-size: 20px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -178,234 +268,321 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+            gap: 12px;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
         
         .control-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.6);
+        }
+        
+        .control-btn:hover:not(:disabled)::before {
+            left: 100%;
         }
         
         .control-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
             transform: none !important;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
         }
         
+        /* ИНФОРМАЦИЯ О СТРАНИЦЕ */
         .page-info {
-            font-size: 24px;
+            font-size: 28px;
             color: #00d4ff;
             font-weight: 700;
-            min-width: 140px;
+            min-width: 160px;
             text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+            padding: 0 25px;
         }
         
         .page-info span {
             color: white;
+            font-size: 32px;
         }
         
-        /* ПОДСКАЗКИ */
-        .instructions {
-            text-align: center;
-            color: #a0a0ff;
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 20px 0;
-            max-width: 800px;
+        /* КНОПКА ПОЛНОГО ЭКРАНА */
+        .fullscreen-btn {
+            position: absolute !important;
+            top: 20px;
+            right: 20px;
+            width: 60px !important;
+            height: 60px !important;
+            min-width: auto !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            background: rgba(0, 212, 255, 0.2) !important;
+            border: 2px solid rgba(0, 212, 255, 0.5) !important;
+            z-index: 1001;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .fullscreen-btn:hover {
+            background: rgba(0, 212, 255, 0.4) !important;
         }
         
         /* БЫСТРАЯ НАВИГАЦИЯ */
         .quick-nav {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 15px;
             margin: 25px 0;
             flex-wrap: wrap;
+            max-width: 800px;
         }
         
         .quick-btn {
-            padding: 8px 18px;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 12px 25px;
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid rgba(0, 212, 255, 0.4);
             color: #00d4ff;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: 600;
             transition: all 0.3s;
+            min-width: 50px;
+            text-align: center;
         }
         
         .quick-btn:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: translateY(-2px);
+            background: rgba(0, 212, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+        
+        .quick-btn.active {
+            background: #00d4ff;
+            color: #0a0a2a;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
         }
         
         /* СТАТУС */
         .status {
-            padding: 15px 25px;
-            border-radius: 10px;
+            padding: 20px 40px;
+            border-radius: 15px;
             margin: 20px auto;
             text-align: center;
-            max-width: 500px;
+            max-width: 600px;
             display: none;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
         
         .loading {
-            background: rgba(0, 212, 255, 0.1);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 100, 255, 0.1));
             color: #00d4ff;
-            border-left: 4px solid #00d4ff;
-        }
-        
-        .error {
-            background: rgba(255, 50, 50, 0.1);
-            color: #ff5050;
-            border-left: 4px solid #ff5050;
+            border: 2px solid rgba(0, 212, 255, 0.3);
         }
         
         .success {
-            background: rgba(0, 255, 100, 0.1);
-            color: #00ff64;
-            border-left: 4px solid #00ff64;
+            background: linear-gradient(135deg, rgba(0, 255, 100, 0.1), rgba(0, 200, 100, 0.1));
+            color: #00ff88;
+            border: 2px solid rgba(0, 255, 100, 0.3);
         }
         
-        /* АНИМАЦИЯ ПОЯВЛЕНИЯ */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .error {
+            background: linear-gradient(135deg, rgba(255, 50, 50, 0.1), rgba(200, 0, 0, 0.1));
+            color: #ff5555;
+            border: 2px solid rgba(255, 50, 50, 0.3);
+        }
+        
+        /* АНИМАЦИИ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .fade-in {
-            animation: fadeInUp 0.6s ease forwards;
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        /* ПОДСКАЗКА */
+        .hint {
+            color: #8899cc;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.6;
+            max-width: 800px;
+        }
+        
+        /* КРИВИЗНА СТРАНИЦЫ - ЭФФЕКТ ГИБКОСТИ */
+        .page.curved {
+            transform-style: preserve-3d;
+        }
+        
+        .page.curved::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, 
+                transparent 0%, 
+                rgba(0,0,0,0.02) 10%,
+                rgba(0,0,0,0.05) 50%,
+                rgba(0,0,0,0.02) 90%,
+                transparent 100%);
+            pointer-events: none;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
     <div class="header fade-in">
         <div class="logo">SMART<span>AV</span></div>
-        <p class="subtitle">Интерактивный 3D каталог</p>
+        <p class="subtitle">Интерактивный 3D каталог с эффектом перелистывания</p>
     </div>
     
-    <div class="book-container" id="book-container"></div>
-    
-    <div id="status" class="status loading fade-in">
-        Загрузка каталога...
-    </div>
-    
-    <div class="controls fade-in">
-        <button id="prev-btn" class="control-btn" disabled>
-            <span>◀</span> Назад
+    <div class="main-container">
+        <button id="fullscreen-toggle" class="control-btn fullscreen-btn" title="Полный экран">
+            <span id="fullscreen-icon">⛶</span>
         </button>
         
-        <div class="page-info">
-            <span id="current-page">1</span> из <span id="total-pages">16</span>
+        <div class="book-wrapper">
+            <div id="book"></div>
         </div>
         
-        <button id="next-btn" class="control-btn" disabled>
-            Вперед <span>▶</span>
-        </button>
+        <div id="status" class="status loading fade-in">
+            Загрузка каталога...
+        </div>
+        
+        <div class="control-panel fade-in">
+            <button id="prev-btn" class="control-btn big-btn" disabled>
+                <span style="font-size: 28px;">◀</span> НАЗАД
+            </button>
+            
+            <div class="page-info">
+                <span id="current-page">1</span> / <span id="total-pages">16</span>
+            </div>
+            
+            <button id="next-btn" class="control-btn big-btn" disabled>
+                ВПЕРЕД <span style="font-size: 28px;">▶</span>
+            </button>
+        </div>
+        
+        <div class="quick-nav" id="quick-nav"></div>
+        
+        <div class="hint fade-in">
+            <p>• Перетащите уголок страницы для реалистичного перелистывания</p>
+            <p>• Используйте большие кнопки или клавиши ← → для навигации</p>
+            <p>• Нажмите ⛶ для полноэкранного режима</p>
+        </div>
     </div>
-    
-    <div class="instructions fade-in">
-        <p>• Перетащите правый верхний угол страницы влево для перелистывания вперед</p>
-        <p>• Перетащите левый верхний угол вправо для перелистывания назад</p>
-        <p>• Или используйте кнопки управления / клавиши ← →</p>
-    </div>
-    
-    <div class="quick-nav" id="quick-nav"></div>
 
     <script>
-        // ПРОСТОЙ И РАБОЧИЙ FLIPBOOK
-        class SimpleBook {
+        // КЛАСС КНИГИ С РЕАЛИСТИЧНОЙ ФИЗИКОЙ
+        class RealisticBook {
             constructor(containerId, pages) {
                 this.container = document.getElementById(containerId);
                 this.pages = pages;
                 this.currentPage = 1;
                 this.isTurning = false;
-                this.bookPages = [];
+                this.isDragging = false;
+                this.dragStartX = 0;
+                this.dragStartY = 0;
+                this.currentAngle = 0;
+                this.dragPage = null;
+                this.dragDirection = 0;
+                this.pageElements = [];
+                this.isFullscreen = false;
                 
                 this.init();
             }
             
             async init() {
-                await this.loadAllPages();
-                this.createBook();
-                this.setupControls();
-                this.updateDisplay();
-                this.showStatus('success', '✓ Каталог загружен!');
+                await this.loadImages();
+                this.createPages();
+                this.setupEventListeners();
+                this.createQuickNavigation();
+                this.showPage(1);
+                this.updateControls();
+                
+                this.showStatus('success', '✓ Каталог загружен! Готов к просмотру.');
             }
             
-            async loadAllPages() {
+            async loadImages() {
                 const status = document.getElementById('status');
                 status.style.display = 'block';
-                status.textContent = 'Загрузка изображений...';
                 
-                // Загружаем все изображения
                 const promises = this.pages.map((filename, index) => {
                     return new Promise((resolve) => {
                         const img = new Image();
                         img.onload = () => {
-                            resolve({ index, img, filename, loaded: true });
+                            resolve({ index, img, loaded: true });
+                            status.textContent = `Загрузка: ${index + 1}/${this.pages.length}`;
                         };
                         img.onerror = () => {
-                            // Создаем заглушку при ошибке
+                            // Заглушка для ошибок
                             const canvas = document.createElement('canvas');
-                            canvas.width = 800;
-                            canvas.height = 600;
+                            canvas.width = 1000;
+                            canvas.height = 700;
                             const ctx = canvas.getContext('2d');
-                            ctx.fillStyle = '#f0f0f0';
-                            ctx.fillRect(0, 0, 800, 600);
-                            ctx.fillStyle = '#666';
-                            ctx.font = '30px Arial';
+                            ctx.fillStyle = '#1a1a2a';
+                            ctx.fillRect(0, 0, 1000, 700);
+                            ctx.fillStyle = '#4a4a6a';
+                            ctx.font = '40px Arial';
                             ctx.textAlign = 'center';
-                            ctx.fillText(`Страница ${index + 1}`, 400, 300);
+                            ctx.fillText(`Страница ${index + 1}`, 500, 350);
+                            ctx.font = '20px Arial';
+                            ctx.fillText('SMART-AV', 500, 400);
                             img.src = canvas.toDataURL();
-                            resolve({ index, img, filename, loaded: false });
+                            resolve({ index, img, loaded: false });
                         };
                         img.src = `images/${filename}`;
                     });
                 });
                 
-                const results = await Promise.all(promises);
-                this.loadedImages = results.sort((a, b) => a.index - b.index);
-                
-                // Обновляем статус
-                const loadedCount = results.filter(r => r.loaded).length;
-                status.textContent = `Загружено: ${loadedCount} из ${this.pages.length} страниц`;
+                await Promise.all(promises);
             }
             
-            createBook() {
+            createPages() {
                 this.container.innerHTML = '';
-                this.bookPages = [];
+                this.pageElements = [];
                 
                 // Создаем все страницы
-                for (let i = 0; i < this.loadedImages.length; i++) {
-                    const pageData = this.loadedImages[i];
+                for (let i = 0; i < this.pages.length; i++) {
                     const pageNum = i + 1;
-                    const isRightPage = pageNum % 2 === 0; // Четные - правые
+                    const isRight = pageNum % 2 === 0; // Четные - правые страницы
                     
                     const page = document.createElement('div');
-                    page.className = `page ${isRightPage ? 'right' : 'left'}`;
+                    page.className = `page ${isRight ? 'right' : 'left'} curved`;
                     page.dataset.page = pageNum;
                     
-                    // Изображение
                     const img = document.createElement('img');
                     img.className = 'page-image';
-                    img.src = pageData.img.src;
+                    img.src = `images/${this.pages[i]}`;
                     img.alt = `Страница ${pageNum}`;
                     
-                    // Уголок
                     const corner = document.createElement('div');
                     corner.className = 'page-corner';
                     corner.title = 'Перетащите для перелистывания';
                     
-                    // Номер
                     const number = document.createElement('div');
                     number.className = 'page-number';
                     number.textContent = pageNum;
@@ -415,100 +592,12 @@
                     page.appendChild(number);
                     
                     this.container.appendChild(page);
-                    this.bookPages.push(page);
-                    
-                    // Начальное положение
-                    if (isRightPage) {
-                        // Правая страница: видна если это текущая страница
-                        page.style.opacity = pageNum === 2 ? '1' : '0';
-                        page.style.transform = 'rotateY(0deg)';
-                        page.style.zIndex = pageNum === 2 ? '2' : '1';
-                    } else {
-                        // Левая страница: видна если это следующая за текущей
-                        page.style.opacity = pageNum === 1 ? '1' : '0';
-                        page.style.transform = 'rotateY(0deg)';
-                        page.style.zIndex = pageNum === 1 ? '2' : '1';
-                    }
-                    
-                    // События для уголка
-                    this.setupPageEvents(page, pageNum, isRightPage);
+                    this.pageElements.push(page);
                 }
             }
             
-            setupPageEvents(page, pageNum, isRightPage) {
-                const corner = page.querySelector('.page-corner');
-                let isDragging = false;
-                let startX = 0;
-                
-                // Начало перетаскивания
-                corner.addEventListener('mousedown', (e) => {
-                    if (this.isTurning) return;
-                    
-                    isDragging = true;
-                    startX = e.clientX;
-                    page.style.transition = 'none';
-                    e.preventDefault();
-                });
-                
-                // Перетаскивание
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging || this.isTurning) return;
-                    
-                    const deltaX = e.clientX - startX;
-                    let angle = 0;
-                    
-                    if (isRightPage) {
-                        // Правая страница: тянем влево
-                        angle = Math.max(-180, Math.min(0, deltaX * 0.5));
-                        page.style.transform = `rotateY(${angle}deg)`;
-                    } else {
-                        // Левая страница: тянем вправо
-                        angle = Math.min(180, Math.max(0, deltaX * 0.5));
-                        page.style.transform = `rotateY(${angle}deg)`;
-                    }
-                    
-                    // Поднимаем страницу при перелистывании
-                    page.style.zIndex = Math.abs(angle) > 20 ? '100' : '2';
-                });
-                
-                // Конец перетаскивания
-                document.addEventListener('mouseup', () => {
-                    if (!isDragging) return;
-                    
-                    isDragging = false;
-                    page.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    
-                    const currentTransform = page.style.transform;
-                    const currentAngle = parseInt(currentTransform.match(/rotateY\((-?\d+)deg\)/)?.[1] || 0);
-                    
-                    // Если угол больше 90 градусов - перелистываем
-                    if (Math.abs(currentAngle) > 90) {
-                        if (isRightPage) {
-                            this.turnPage(1); // Вперед
-                        } else {
-                            this.turnPage(-1); // Назад
-                        }
-                    } else {
-                        // Возвращаем на место
-                        page.style.transform = 'rotateY(0deg)';
-                        page.style.zIndex = '2';
-                    }
-                });
-                
-                // Двойной клик
-                corner.addEventListener('dblclick', () => {
-                    if (this.isTurning) return;
-                    
-                    if (isRightPage && pageNum === this.currentPage + 1) {
-                        this.turnPage(1);
-                    } else if (!isRightPage && pageNum === this.currentPage) {
-                        this.turnPage(-1);
-                    }
-                });
-            }
-            
-            setupControls() {
-                // Кнопки
+            setupEventListeners() {
+                // Большие кнопки
                 document.getElementById('prev-btn').addEventListener('click', () => this.turnPage(-1));
                 document.getElementById('next-btn').addEventListener('click', () => this.turnPage(1));
                 
@@ -516,23 +605,114 @@
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'ArrowLeft') this.turnPage(-1);
                     if (e.key === 'ArrowRight') this.turnPage(1);
+                    if (e.key === 'f' || e.key === 'F') this.toggleFullscreen();
+                    if (e.key === 'Escape' && this.isFullscreen) this.toggleFullscreen();
                 });
                 
-                // Быстрая навигация
-                this.createQuickNav();
+                // Полноэкранный режим
+                document.getElementById('fullscreen-toggle').addEventListener('click', () => this.toggleFullscreen());
+                
+                // События мыши для страниц
+                this.pageElements.forEach(page => {
+                    const corner = page.querySelector('.page-corner');
+                    const pageNum = parseInt(page.dataset.page);
+                    const isRight = page.classList.contains('right');
+                    
+                    // Начало перетаскивания
+                    corner.addEventListener('mousedown', (e) => this.startDrag(e, page, isRight));
+                    corner.addEventListener('touchstart', (e) => this.startDrag(e, page, isRight));
+                    
+                    // Двойной клик
+                    corner.addEventListener('dblclick', () => {
+                        if (isRight && pageNum === this.currentPage + 1) {
+                            this.turnPage(1);
+                        } else if (!isRight && pageNum === this.currentPage) {
+                            this.turnPage(-1);
+                        }
+                    });
+                });
+                
+                // События перетаскивания
+                document.addEventListener('mousemove', (e) => this.handleDrag(e));
+                document.addEventListener('touchmove', (e) => this.handleDrag(e));
+                document.addEventListener('mouseup', () => this.endDrag());
+                document.addEventListener('touchend', () => this.endDrag());
             }
             
-            createQuickNav() {
-                const quickNav = document.getElementById('quick-nav');
-                const importantPages = [1, 3, 5, 8, 11, 13, 16];
+            startDrag(e, page, isRight) {
+                if (this.isTurning) return;
                 
-                importantPages.forEach(pageNum => {
-                    const btn = document.createElement('button');
-                    btn.className = 'quick-btn';
-                    btn.textContent = pageNum;
-                    btn.addEventListener('click', () => this.goToPage(pageNum));
-                    quickNav.appendChild(btn);
-                });
+                e.preventDefault();
+                this.isDragging = true;
+                this.dragPage = page;
+                this.dragDirection = isRight ? 1 : -1;
+                
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+                
+                this.dragStartX = clientX;
+                this.dragStartY = clientY;
+                this.currentAngle = 0;
+                
+                page.style.transition = 'none';
+                page.style.zIndex = '1000';
+            }
+            
+            handleDrag(e) {
+                if (!this.isDragging || !this.dragPage) return;
+                
+                e.preventDefault();
+                const clientX = e.clientX || e.touches[0].clientX;
+                const deltaX = clientX - this.dragStartX;
+                
+                // Плавное вычисление угла с эффектом сопротивления
+                let angle = 0;
+                if (this.dragDirection === 1) {
+                    // Правая страница: тянем влево (от 0 до -180)
+                    angle = Math.max(-180, deltaX * -0.6);
+                    // Эффект гибкости: добавляем небольшую кривизну
+                    const curve = Math.sin(Math.abs(angle) * Math.PI / 360) * 10;
+                    this.dragPage.style.transform = `rotateY(${angle}deg) translateX(${curve}px)`;
+                } else {
+                    // Левая страница: тянем вправо (от 0 до 180)
+                    angle = Math.min(180, deltaX * 0.6);
+                    const curve = Math.sin(Math.abs(angle) * Math.PI / 360) * -10;
+                    this.dragPage.style.transform = `rotateY(${angle}deg) translateX(${curve}px)`;
+                }
+                
+                this.currentAngle = angle;
+                
+                // Эффект тени при перелистывании
+                const shadowOpacity = Math.min(0.3, Math.abs(angle) / 600);
+                this.dragPage.style.boxShadow = `
+                    inset 0 0 20px rgba(0,0,0,0.1),
+                    0 5px 30px rgba(0,0,0,${0.2 + shadowOpacity})
+                `;
+            }
+            
+            endDrag() {
+                if (!this.isDragging || !this.dragPage) return;
+                
+                this.isDragging = false;
+                this.dragPage.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.8s';
+                
+                // Если угол больше 100 градусов - перелистываем
+                if (Math.abs(this.currentAngle) > 100) {
+                    this.turnPage(this.dragDirection);
+                } else {
+                    // Возвращаем на место с пружинным эффектом
+                    this.dragPage.style.transform = 'rotateY(0deg) translateX(0px)';
+                    this.dragPage.style.boxShadow = `
+                        inset 0 0 20px rgba(0,0,0,0.1),
+                        0 5px 30px rgba(0,0,0,0.2)
+                    `;
+                    
+                    setTimeout(() => {
+                        this.dragPage.style.zIndex = '2';
+                    }, 800);
+                }
+                
+                this.dragPage = null;
             }
             
             async turnPage(direction) {
@@ -544,9 +724,9 @@
                 this.isTurning = true;
                 
                 // Находим страницу для анимации
-                const pageToTurn = this.bookPages.find(p => {
-                    const pageNum = parseInt(p.dataset.page);
-                    const isRight = p.classList.contains('right');
+                const pageToTurn = this.pageElements.find(page => {
+                    const pageNum = parseInt(page.dataset.page);
+                    const isRight = page.classList.contains('right');
                     
                     if (direction === 1) {
                         return isRight && pageNum === newPage;
@@ -558,30 +738,87 @@
                 if (pageToTurn) {
                     // Анимация перелистывания
                     const targetAngle = direction === 1 ? -180 : 180;
+                    const curve = direction === 1 ? 10 : -10;
                     
-                    // Плавная анимация
-                    pageToTurn.style.transform = `rotateY(${targetAngle}deg)`;
-                    pageToTurn.style.zIndex = '100';
+                    // Плавная анимация с эффектом гибкости
+                    pageToTurn.style.transform = `rotateY(${targetAngle}deg) translateX(${curve}px)`;
+                    pageToTurn.style.zIndex = '1000';
+                    
+                    // Звук перелистывания
+                    this.playFlipSound();
                     
                     // Ждем окончания анимации
-                    await this.wait(800);
+                    await new Promise(resolve => setTimeout(resolve, 800));
                     
                     // Обновляем состояние
                     this.currentPage = newPage;
-                    this.updateDisplay();
+                    this.showPage(this.currentPage);
+                    this.updateControls();
                     
                     // Сбрасываем трансформацию
-                    pageToTurn.style.transform = 'rotateY(0deg)';
+                    pageToTurn.style.transform = 'rotateY(0deg) translateX(0px)';
                     pageToTurn.style.zIndex = '2';
-                    
-                    // Показываем/скрываем страницы
-                    this.updatePagesVisibility();
-                    
-                    // Звук
-                    this.playFlipSound();
                 }
                 
                 this.isTurning = false;
+            }
+            
+            showPage(pageNum) {
+                // Показываем только текущую и следующую страницы
+                this.pageElements.forEach(page => {
+                    const pNum = parseInt(page.dataset.page);
+                    const isRight = page.classList.contains('right');
+                    
+                    let shouldShow = false;
+                    
+                    if (isRight) {
+                        // Правая страница: показываем если это следующая страница
+                        shouldShow = pNum === pageNum + 1;
+                    } else {
+                        // Левая страница: показываем если это текущая страница
+                        shouldShow = pNum === pageNum;
+                    }
+                    
+                    page.style.opacity = shouldShow ? '1' : '0.3';
+                    page.style.pointerEvents = shouldShow ? 'auto' : 'none';
+                    
+                    if (shouldShow) {
+                        page.style.zIndex = '2';
+                    }
+                });
+                
+                // Обновляем активную кнопку быстрой навигации
+                document.querySelectorAll('.quick-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.dataset.page) === pageNum) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            updateControls() {
+                document.getElementById('current-page').textContent = this.currentPage;
+                document.getElementById('total-pages').textContent = this.pages.length;
+                
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                prevBtn.disabled = this.currentPage <= 1 || this.isTurning;
+                nextBtn.disabled = this.currentPage >= this.pages.length || this.isTurning;
+            }
+            
+            createQuickNavigation() {
+                const quickNav = document.getElementById('quick-nav');
+                const importantPages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+                
+                importantPages.forEach(pageNum => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quick-btn';
+                    btn.textContent = pageNum;
+                    btn.dataset.page = pageNum;
+                    btn.addEventListener('click', () => this.goToPage(pageNum));
+                    quickNav.appendChild(btn);
+                });
             }
             
             goToPage(targetPage) {
@@ -589,34 +826,52 @@
                 
                 // Простой переход без анимации
                 this.currentPage = targetPage;
-                this.updateDisplay();
-                this.updatePagesVisibility();
+                this.showPage(this.currentPage);
+                this.updateControls();
+                this.playFlipSound();
             }
             
-            updateDisplay() {
-                document.getElementById('current-page').textContent = this.currentPage;
-                document.getElementById('total-pages').textContent = this.pages.length;
+            toggleFullscreen() {
+                this.isFullscreen = !this.isFullscreen;
                 
-                const prevBtn = document.getElementById('prev-btn');
-                const nextBtn = document.getElementById('next-btn');
-                
-                prevBtn.disabled = this.currentPage <= 1;
-                nextBtn.disabled = this.currentPage >= this.pages.length;
+                if (this.isFullscreen) {
+                    document.body.classList.add('fullscreen');
+                    document.getElementById('fullscreen-icon').textContent = '⛶';
+                    document.exitFullscreen?.();
+                    document.documentElement.requestFullscreen?.();
+                } else {
+                    document.body.classList.remove('fullscreen');
+                    document.getElementById('fullscreen-icon').textContent = '⛶';
+                    document.exitFullscreen?.();
+                }
             }
             
-            updatePagesVisibility() {
-                this.bookPages.forEach(page => {
-                    const pageNum = parseInt(page.dataset.page);
-                    const isRight = page.classList.contains('right');
+            playFlipSound() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     
-                    if (isRight) {
-                        // Правая страница: видна если это следующая за текущей
-                        page.style.opacity = pageNum === this.currentPage + 1 ? '1' : '0';
-                    } else {
-                        // Левая страница: видна если это текущая
-                        page.style.opacity = pageNum === this.currentPage ? '1' : '0';
+                    // Создаем реалистичный звук перелистывания
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            
+                            oscillator.frequency.value = 80 + Math.random() * 40;
+                            oscillator.type = 'sine';
+                            
+                            gainNode.gain.setValueAtTime(0.03, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+                            
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.15);
+                        }, i * 50);
                     }
-                });
+                } catch (e) {
+                    // Браузер не поддерживает Web Audio API
+                }
             }
             
             showStatus(type, message) {
@@ -630,35 +885,9 @@
                         status.style.opacity = '0';
                         setTimeout(() => {
                             status.style.display = 'none';
-                        }, 300);
-                    }, 2000);
+                        }, 500);
+                    }, 2500);
                 }
-            }
-            
-            playFlipSound() {
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.frequency.value = 100 + Math.random() * 50;
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
-                    
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.2);
-                } catch (e) {
-                    // Браузер не поддерживает
-                }
-            }
-            
-            wait(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
             }
         }
         
@@ -685,11 +914,20 @@
             ];
             
             try {
-                window.book = new SimpleBook('book-container', imageFiles);
+                window.book = new RealisticBook('book', imageFiles);
             } catch (error) {
-                document.getElementById('status').className = 'status error fade-in';
-                document.getElementById('status').textContent = `Ошибка: ${error.message}`;
-                document.getElementById('status').style.display = 'block';
+                const status = document.getElementById('status');
+                status.className = 'status error fade-in';
+                status.textContent = `Ошибка загрузки: ${error.message}`;
+                status.style.display = 'block';
+            }
+        });
+        
+        // Полноэкранный режим при нажатии F11
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F11') {
+                e.preventDefault();
+                window.book?.toggleFullscreen();
             }
         });
     </script>
