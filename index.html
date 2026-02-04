@@ -12,155 +12,145 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            font-family: 'Arial', sans-serif;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: white;
             padding: 20px;
         }
         
-        .container {
-            text-align: center;
-            width: 100%;
-            max-width: 1400px;
-        }
-        
         .header {
+            text-align: center;
             margin-bottom: 30px;
+            width: 100%;
         }
         
         .logo {
-            color: white;
             font-size: 48px;
-            font-weight: bold;
+            font-weight: 800;
+            color: white;
             margin-bottom: 10px;
-            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         
         .logo span {
-            color: #4cc9f0;
+            color: #00d4ff;
         }
         
         .subtitle {
-            color: #a0a0c0;
+            color: #a0a0ff;
             font-size: 18px;
+            opacity: 0.9;
         }
         
-        /* 3D КНИГА */
-        .book-wrapper {
+        /* КОНТЕЙНЕР КНИГИ */
+        .book-container {
+            width: 900px;
+            height: 630px;
+            margin: 20px auto 40px;
             position: relative;
-            width: 1000px;
-            height: 700px;
-            margin: 0 auto 40px;
-            perspective: 1500px;
+            perspective: 2000px;
+            transform-style: preserve-3d;
         }
         
-        .book {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
-            transform-origin: left center;
+        @media (max-width: 1000px) {
+            .book-container {
+                width: 90vw;
+                height: calc(90vw * 0.7);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .book-container {
+                width: 95vw;
+                height: calc(95vw * 0.7);
+            }
+            .logo { font-size: 36px; }
         }
         
         /* СТРАНИЦЫ */
         .page {
             position: absolute;
-            width: 50%;
+            width: 100%;
             height: 100%;
-            background: white;
-            backface-visibility: hidden;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        /* ЛЕВАЯ СТОРОНА (четные страницы) */
-        .page:nth-child(even) {
+            top: 0;
             left: 0;
-            transform-origin: right center;
+            background: white;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            border-radius: 2px;
+            overflow: hidden;
         }
         
-        /* ПРАВАЯ СТОРОНА (нечетные страницы) */
-        .page:nth-child(odd) {
-            right: 0;
+        /* ПРАВАЯ СТРАНИЦА (четные номера) */
+        .page.right {
             transform-origin: left center;
         }
         
-        /* ИЗОБРАЖЕНИЯ В СТРАНИЦАХ */
-        .page-img {
+        /* ЛЕВАЯ СТРАНИЦА (нечетные номера) */
+        .page.left {
+            transform-origin: right center;
+        }
+        
+        /* ИЗОБРАЖЕНИЕ СТРАНИЦЫ */
+        .page-image {
             width: 100%;
             height: 100%;
             object-fit: contain;
             pointer-events: none;
-            user-select: none;
         }
         
-        /* УГОЛКИ ДЛЯ ПЕРЕЛИСТЫВАНИЯ */
+        /* УГОЛОК ДЛЯ ПЕРЕТАСКИВАНИЯ */
         .page-corner {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            z-index: 10;
+            width: 80px;
+            height: 80px;
             cursor: pointer;
-            transition: background 0.3s;
+            z-index: 10;
         }
         
-        /* ПРАВЫЙ ВЕРХНИЙ УГОЛ */
-        .page:nth-child(odd) .page-corner {
+        .page.right .page-corner {
             top: 0;
             right: 0;
-            background: linear-gradient(225deg, transparent 50%, rgba(76, 201, 240, 0.1) 50%);
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 212, 255, 0.15) 50%);
         }
         
-        .page:nth-child(odd) .page-corner:hover {
-            background: linear-gradient(225deg, transparent 50%, rgba(76, 201, 240, 0.3) 50%);
+        .page.right .page-corner:hover {
+            background: linear-gradient(225deg, transparent 50%, rgba(0, 212, 255, 0.3) 50%);
         }
         
-        /* ЛЕВЫЙ ВЕРХНИЙ УГОЛ */
-        .page:nth-child(even) .page-corner {
+        .page.left .page-corner {
             top: 0;
             left: 0;
-            background: linear-gradient(135deg, transparent 50%, rgba(76, 201, 240, 0.1) 50%);
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.15) 50%);
         }
         
-        .page:nth-child(even) .page-corner:hover {
-            background: linear-gradient(135deg, transparent 50%, rgba(76, 201, 240, 0.3) 50%);
+        .page.left .page-corner:hover {
+            background: linear-gradient(135deg, transparent 50%, rgba(0, 212, 255, 0.3) 50%);
         }
         
-        /* ТЕНИ И ЭФФЕКТЫ */
-        .page-shadow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .page.turning .page-shadow {
-            opacity: 1;
-        }
-        
-        /* ИНФОРМАЦИЯ О СТРАНИЦЕ */
+        /* НОМЕР СТРАНИЦЫ */
         .page-number {
             position: absolute;
             bottom: 15px;
-            padding: 5px 15px;
             background: rgba(0,0,0,0.7);
             color: white;
-            font-size: 14px;
+            padding: 5px 15px;
             border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
         }
         
-        .page:nth-child(odd) .page-number {
+        .page.right .page-number {
             right: 15px;
         }
         
-        .page:nth-child(even) .page-number {
+        .page.left .page-number {
             left: 15px;
         }
         
@@ -169,288 +159,356 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 30px;
-            margin-top: 30px;
+            gap: 40px;
+            margin: 30px 0;
             flex-wrap: wrap;
         }
         
         .control-btn {
-            padding: 15px 35px;
-            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #00d4ff, #0088ff);
             color: white;
             border: none;
             border-radius: 30px;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            min-width: 160px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            min-width: 160px;
             justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
         }
         
         .control-btn:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(76, 201, 240, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.5);
         }
         
         .control-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none !important;
         }
         
         .page-info {
-            color: white;
             font-size: 24px;
-            min-width: 150px;
-            font-weight: bold;
+            color: #00d4ff;
+            font-weight: 700;
+            min-width: 140px;
+            text-align: center;
         }
         
         .page-info span {
-            color: #4cc9f0;
+            color: white;
         }
         
         /* ПОДСКАЗКИ */
-        .hints {
-            margin-top: 25px;
-            color: #a0a0c0;
+        .instructions {
+            text-align: center;
+            color: #a0a0ff;
             font-size: 16px;
             line-height: 1.6;
+            margin: 20px 0;
+            max-width: 800px;
         }
         
-        .hints p {
-            margin: 5px 0;
+        /* БЫСТРАЯ НАВИГАЦИЯ */
+        .quick-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 25px 0;
+            flex-wrap: wrap;
         }
         
-        /* ЗАГРУЗКА */
+        .quick-btn {
+            padding: 8px 18px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* СТАТУС */
+        .status {
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 20px auto;
+            text-align: center;
+            max-width: 500px;
+            display: none;
+        }
+        
         .loading {
-            color: #4cc9f0;
-            font-size: 20px;
-            margin: 30px 0;
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            border-left: 4px solid #00d4ff;
         }
         
-        /* АДАПТИВНОСТЬ */
-        @media (max-width: 1100px) {
-            .book-wrapper {
-                width: 90vw;
-                height: calc(90vw * 0.7);
-            }
+        .error {
+            background: rgba(255, 50, 50, 0.1);
+            color: #ff5050;
+            border-left: 4px solid #ff5050;
         }
         
-        @media (max-width: 768px) {
-            .book-wrapper {
-                width: 95vw;
-                height: calc(95vw * 0.7);
-            }
-            
-            .logo {
-                font-size: 36px;
-            }
-            
-            .control-btn {
-                padding: 12px 25px;
-                font-size: 16px;
-                min-width: 140px;
-            }
+        .success {
+            background: rgba(0, 255, 100, 0.1);
+            color: #00ff64;
+            border-left: 4px solid #00ff64;
         }
         
-        @media (max-width: 480px) {
-            .book-wrapper {
-                width: 100vw;
-                height: calc(100vw * 0.7);
+        /* АНИМАЦИЯ ПОЯВЛЕНИЯ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-            
-            .controls {
-                flex-direction: column;
-                gap: 15px;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            
-            .page-info {
-                order: -1;
-            }
-        }
-        
-        /* АНИМАЦИЯ ЗАГРУЗКИ */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         
         .fade-in {
-            animation: fadeIn 0.5s ease forwards;
+            animation: fadeInUp 0.6s ease forwards;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header fade-in">
-            <div class="logo">SMART<span>AV</span></div>
-            <p class="subtitle">Интерактивный 3D каталог</p>
-        </div>
-        
-        <div class="book-wrapper">
-            <div class="book" id="book"></div>
-        </div>
-        
-        <div id="loading" class="loading fade-in">
-            Загрузка страниц...
-        </div>
-        
-        <div class="controls fade-in">
-            <button id="prev-btn" class="control-btn" disabled>
-                <span>◀</span> Назад
-            </button>
-            
-            <div class="page-info">
-                <span id="current-page">1</span> из <span id="total-pages">16</span>
-            </div>
-            
-            <button id="next-btn" class="control-btn" disabled>
-                Вперед <span>▶</span>
-            </button>
-        </div>
-        
-        <div class="hints fade-in">
-            <p>• Перетащите уголок страницы для перелистывания</p>
-            <p>• Или используйте кнопки/клавиши ← →</p>
-            <p>• Двойной клик по странице перелистывает сразу</p>
-        </div>
+    <div class="header fade-in">
+        <div class="logo">SMART<span>AV</span></div>
+        <p class="subtitle">Интерактивный 3D каталог</p>
     </div>
+    
+    <div class="book-container" id="book-container"></div>
+    
+    <div id="status" class="status loading fade-in">
+        Загрузка каталога...
+    </div>
+    
+    <div class="controls fade-in">
+        <button id="prev-btn" class="control-btn" disabled>
+            <span>◀</span> Назад
+        </button>
+        
+        <div class="page-info">
+            <span id="current-page">1</span> из <span id="total-pages">16</span>
+        </div>
+        
+        <button id="next-btn" class="control-btn" disabled>
+            Вперед <span>▶</span>
+        </button>
+    </div>
+    
+    <div class="instructions fade-in">
+        <p>• Перетащите правый верхний угол страницы влево для перелистывания вперед</p>
+        <p>• Перетащите левый верхний угол вправо для перелистывания назад</p>
+        <p>• Или используйте кнопки управления / клавиши ← →</p>
+    </div>
+    
+    <div class="quick-nav" id="quick-nav"></div>
 
     <script>
-        // КЛАСС 3D КНИГИ
-        class Book3D {
+        // ПРОСТОЙ И РАБОЧИЙ FLIPBOOK
+        class SimpleBook {
             constructor(containerId, pages) {
                 this.container = document.getElementById(containerId);
                 this.pages = pages;
                 this.currentPage = 1;
                 this.isTurning = false;
-                this.isDragging = false;
-                this.dragStartX = 0;
-                this.dragStartY = 0;
-                this.dragAngle = 0;
-                this.flipDirection = 0; // -1 = назад, 1 = вперед
+                this.bookPages = [];
                 
                 this.init();
             }
             
-            init() {
-                this.createBookStructure();
-                this.loadImages();
-                this.setupEventListeners();
-                this.updateControls();
-                
-                // Показываем первую страницу
-                setTimeout(() => {
-                    this.showPage(1);
-                }, 500);
+            async init() {
+                await this.loadAllPages();
+                this.createBook();
+                this.setupControls();
+                this.updateDisplay();
+                this.showStatus('success', '✓ Каталог загружен!');
             }
             
-            // СОЗДАЕМ СТРУКТУРУ КНИГИ (1-я страница отдельно, остальные попарно)
-            createBookStructure() {
+            async loadAllPages() {
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                status.textContent = 'Загрузка изображений...';
+                
+                // Загружаем все изображения
+                const promises = this.pages.map((filename, index) => {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            resolve({ index, img, filename, loaded: true });
+                        };
+                        img.onerror = () => {
+                            // Создаем заглушку при ошибке
+                            const canvas = document.createElement('canvas');
+                            canvas.width = 800;
+                            canvas.height = 600;
+                            const ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#f0f0f0';
+                            ctx.fillRect(0, 0, 800, 600);
+                            ctx.fillStyle = '#666';
+                            ctx.font = '30px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(`Страница ${index + 1}`, 400, 300);
+                            img.src = canvas.toDataURL();
+                            resolve({ index, img, filename, loaded: false });
+                        };
+                        img.src = `images/${filename}`;
+                    });
+                });
+                
+                const results = await Promise.all(promises);
+                this.loadedImages = results.sort((a, b) => a.index - b.index);
+                
+                // Обновляем статус
+                const loadedCount = results.filter(r => r.loaded).length;
+                status.textContent = `Загружено: ${loadedCount} из ${this.pages.length} страниц`;
+            }
+            
+            createBook() {
                 this.container.innerHTML = '';
+                this.bookPages = [];
                 
-                // Первая страница (обложка) - только правая сторона
-                const firstPage = this.createPage(1, this.pages[0], true);
-                this.container.appendChild(firstPage);
-                
-                // Остальные страницы попарно
-                for (let i = 1; i < this.pages.length; i += 2) {
-                    const leftPageNum = i + 1;
-                    const rightPageNum = i + 2;
+                // Создаем все страницы
+                for (let i = 0; i < this.loadedImages.length; i++) {
+                    const pageData = this.loadedImages[i];
+                    const pageNum = i + 1;
+                    const isRightPage = pageNum % 2 === 0; // Четные - правые
                     
-                    const leftPage = this.createPage(leftPageNum, this.pages[i], false);
-                    const rightPage = this.createPage(rightPageNum, this.pages[i + 1], true);
+                    const page = document.createElement('div');
+                    page.className = `page ${isRightPage ? 'right' : 'left'}`;
+                    page.dataset.page = pageNum;
                     
-                    this.container.appendChild(leftPage);
-                    this.container.appendChild(rightPage);
+                    // Изображение
+                    const img = document.createElement('img');
+                    img.className = 'page-image';
+                    img.src = pageData.img.src;
+                    img.alt = `Страница ${pageNum}`;
+                    
+                    // Уголок
+                    const corner = document.createElement('div');
+                    corner.className = 'page-corner';
+                    corner.title = 'Перетащите для перелистывания';
+                    
+                    // Номер
+                    const number = document.createElement('div');
+                    number.className = 'page-number';
+                    number.textContent = pageNum;
+                    
+                    page.appendChild(img);
+                    page.appendChild(corner);
+                    page.appendChild(number);
+                    
+                    this.container.appendChild(page);
+                    this.bookPages.push(page);
+                    
+                    // Начальное положение
+                    if (isRightPage) {
+                        // Правая страница: видна если это текущая страница
+                        page.style.opacity = pageNum === 2 ? '1' : '0';
+                        page.style.transform = 'rotateY(0deg)';
+                        page.style.zIndex = pageNum === 2 ? '2' : '1';
+                    } else {
+                        // Левая страница: видна если это следующая за текущей
+                        page.style.opacity = pageNum === 1 ? '1' : '0';
+                        page.style.transform = 'rotateY(0deg)';
+                        page.style.zIndex = pageNum === 1 ? '2' : '1';
+                    }
+                    
+                    // События для уголка
+                    this.setupPageEvents(page, pageNum, isRightPage);
                 }
-                
-                // Собираем все страницы
-                this.allPages = Array.from(this.container.children);
             }
             
-            // СОЗДАЕМ ОДНУ СТРАНИЦУ
-            createPage(number, imageUrl, isRightSide) {
-                const page = document.createElement('div');
-                page.className = 'page';
-                page.dataset.page = number;
-                page.dataset.side = isRightSide ? 'right' : 'left';
+            setupPageEvents(page, pageNum, isRightPage) {
+                const corner = page.querySelector('.page-corner');
+                let isDragging = false;
+                let startX = 0;
                 
-                // Изображение
-                const img = document.createElement('img');
-                img.className = 'page-img';
-                img.src = `images/${imageUrl}`;
-                img.alt = `Страница ${number}`;
-                img.onerror = () => {
-                    // Заглушка если картинка не загрузилась
-                    img.style.background = '#f0f0f0';
-                    img.style.display = 'flex';
-                    img.style.alignItems = 'center';
-                    img.style.justifyContent = 'center';
-                    img.innerHTML = `<div style="color: #666; font-size: 24px;">Страница ${number}</div>`;
-                };
+                // Начало перетаскивания
+                corner.addEventListener('mousedown', (e) => {
+                    if (this.isTurning) return;
+                    
+                    isDragging = true;
+                    startX = e.clientX;
+                    page.style.transition = 'none';
+                    e.preventDefault();
+                });
                 
-                // Уголок для перелистывания
-                const corner = document.createElement('div');
-                corner.className = 'page-corner';
-                corner.title = 'Перетащите для перелистывания';
+                // Перетаскивание
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging || this.isTurning) return;
+                    
+                    const deltaX = e.clientX - startX;
+                    let angle = 0;
+                    
+                    if (isRightPage) {
+                        // Правая страница: тянем влево
+                        angle = Math.max(-180, Math.min(0, deltaX * 0.5));
+                        page.style.transform = `rotateY(${angle}deg)`;
+                    } else {
+                        // Левая страница: тянем вправо
+                        angle = Math.min(180, Math.max(0, deltaX * 0.5));
+                        page.style.transform = `rotateY(${angle}deg)`;
+                    }
+                    
+                    // Поднимаем страницу при перелистывании
+                    page.style.zIndex = Math.abs(angle) > 20 ? '100' : '2';
+                });
                 
-                // Тень
-                const shadow = document.createElement('div');
-                shadow.className = 'page-shadow';
-                
-                // Номер страницы
-                const pageNum = document.createElement('div');
-                pageNum.className = 'page-number';
-                pageNum.textContent = number;
-                
-                page.appendChild(img);
-                page.appendChild(corner);
-                page.appendChild(shadow);
-                page.appendChild(pageNum);
-                
-                return page;
-            }
-            
-            // ЗАГРУЖАЕМ ИЗОБРАЖЕНИЯ
-            loadImages() {
-                const loadingEl = document.getElementById('loading');
-                let loaded = 0;
-                const total = this.pages.length;
-                
-                this.pages.forEach((filename, index) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        loaded++;
-                        const percent = Math.round((loaded / total) * 100);
-                        loadingEl.textContent = `Загрузка: ${percent}%`;
-                        
-                        if (loaded === total) {
-                            setTimeout(() => {
-                                loadingEl.style.opacity = '0';
-                                setTimeout(() => {
-                                    loadingEl.style.display = 'none';
-                                    document.getElementById('prev-btn').disabled = false;
-                                    document.getElementById('next-btn').disabled = false;
-                                }, 300);
-                            }, 500);
+                // Конец перетаскивания
+                document.addEventListener('mouseup', () => {
+                    if (!isDragging) return;
+                    
+                    isDragging = false;
+                    page.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
+                    
+                    const currentTransform = page.style.transform;
+                    const currentAngle = parseInt(currentTransform.match(/rotateY\((-?\d+)deg\)/)?.[1] || 0);
+                    
+                    // Если угол больше 90 градусов - перелистываем
+                    if (Math.abs(currentAngle) > 90) {
+                        if (isRightPage) {
+                            this.turnPage(1); // Вперед
+                        } else {
+                            this.turnPage(-1); // Назад
                         }
-                    };
-                    img.onerror = () => {
-                        loaded++;
-                        console.warn(`Не загружено: ${filename}`);
-                    };
-                    img.src = `images/${filename}`;
+                    } else {
+                        // Возвращаем на место
+                        page.style.transform = 'rotateY(0deg)';
+                        page.style.zIndex = '2';
+                    }
+                });
+                
+                // Двойной клик
+                corner.addEventListener('dblclick', () => {
+                    if (this.isTurning) return;
+                    
+                    if (isRightPage && pageNum === this.currentPage + 1) {
+                        this.turnPage(1);
+                    } else if (!isRightPage && pageNum === this.currentPage) {
+                        this.turnPage(-1);
+                    }
                 });
             }
             
-            // НАСТРАИВАЕМ СОБЫТИЯ
-            setupEventListeners() {
-                // Кнопки управления
+            setupControls() {
+                // Кнопки
                 document.getElementById('prev-btn').addEventListener('click', () => this.turnPage(-1));
                 document.getElementById('next-btn').addEventListener('click', () => this.turnPage(1));
                 
@@ -460,146 +518,24 @@
                     if (e.key === 'ArrowRight') this.turnPage(1);
                 });
                 
-                // События мыши для уголков
-                this.allPages.forEach(page => {
-                    const corner = page.querySelector('.page-corner');
-                    
-                    // Начало перетаскивания
-                    corner.addEventListener('mousedown', (e) => this.startDrag(e, page));
-                    corner.addEventListener('touchstart', (e) => this.startDrag(e, page));
-                    
-                    // Двойной клик
-                    corner.addEventListener('dblclick', () => {
-                        const pageNum = parseInt(page.dataset.page);
-                        const isRightSide = page.dataset.side === 'right';
-                        
-                        if (isRightSide && pageNum === this.currentPage) {
-                            this.turnPage(1);
-                        } else if (!isRightSide && pageNum === this.currentPage + 1) {
-                            this.turnPage(-1);
-                        }
-                    });
-                });
+                // Быстрая навигация
+                this.createQuickNav();
+            }
+            
+            createQuickNav() {
+                const quickNav = document.getElementById('quick-nav');
+                const importantPages = [1, 3, 5, 8, 11, 13, 16];
                 
-                // События перетаскивания на документе
-                document.addEventListener('mousemove', (e) => this.drag(e));
-                document.addEventListener('touchmove', (e) => this.drag(e));
-                document.addEventListener('mouseup', () => this.endDrag());
-                document.addEventListener('touchend', () => this.endDrag());
-                
-                // Предотвращаем выделение текста при перетаскивании
-                document.addEventListener('selectstart', (e) => {
-                    if (this.isDragging) e.preventDefault();
+                importantPages.forEach(pageNum => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quick-btn';
+                    btn.textContent = pageNum;
+                    btn.addEventListener('click', () => this.goToPage(pageNum));
+                    quickNav.appendChild(btn);
                 });
             }
             
-            // НАЧАЛО ПЕРЕТАСКИВАНИЯ
-            startDrag(e, page) {
-                if (this.isTurning) return;
-                
-                this.isDragging = true;
-                this.dragPage = page;
-                this.flipDirection = 0;
-                
-                const rect = page.getBoundingClientRect();
-                const isRightSide = page.dataset.side === 'right';
-                
-                if (isRightSide) {
-                    this.dragStartX = rect.right;
-                    this.flipDirection = 1;
-                } else {
-                    this.dragStartX = rect.left;
-                    this.flipDirection = -1;
-                }
-                
-                this.dragStartY = rect.top + rect.height / 2;
-                
-                page.classList.add('turning');
-                e.preventDefault();
-            }
-            
-            // ПЕРЕТАСКИВАНИЕ
-            drag(e) {
-                if (!this.isDragging || this.isTurning) return;
-                
-                const clientX = e.clientX || e.touches[0].clientX;
-                const deltaX = clientX - this.dragStartX;
-                
-                // Вычисляем угол поворота (от -180 до 0 для правой, 0 до 180 для левой)
-                let angle = (deltaX / 300) * 180;
-                angle = Math.max(-180, Math.min(180, angle));
-                
-                if (this.flipDirection === 1) {
-                    angle = Math.min(0, angle); // Правая страница: от 0 до -180
-                } else {
-                    angle = Math.max(0, angle); // Левая страница: от 0 до 180
-                }
-                
-                this.dragAngle = angle;
-                this.updatePageTransform(this.dragPage, angle);
-                
-                e.preventDefault();
-            }
-            
-            // КОНЕЦ ПЕРЕТАСКИВАНИЯ
-            endDrag() {
-                if (!this.isDragging) return;
-                
-                this.isDragging = false;
-                
-                // Если угол больше 90 градусов - перелистываем
-                if (Math.abs(this.dragAngle) > 90) {
-                    this.turnPage(this.flipDirection);
-                } else {
-                    // Возвращаем на место
-                    this.animateToAngle(this.dragPage, 0, 300);
-                }
-                
-                if (this.dragPage) {
-                    setTimeout(() => {
-                        this.dragPage.classList.remove('turning');
-                    }, 300);
-                }
-            }
-            
-            // ПОВОРОТ СТРАНИЦЫ НА УГОЛ
-            updatePageTransform(page, angle) {
-                const isRightSide = page.dataset.side === 'right';
-                const rotationY = isRightSide ? angle : -angle;
-                
-                page.style.transform = isRightSide 
-                    ? `rotateY(${rotationY}deg) translateZ(1px)`
-                    : `rotateY(${rotationY}deg) translateZ(-1px)`;
-                
-                // Обновляем z-index для эффекта поднятия
-                page.style.zIndex = Math.abs(angle) > 10 ? '100' : '1';
-            }
-            
-            // АНИМАЦИЯ К УГЛУ
-            animateToAngle(page, targetAngle, duration) {
-                const startAngle = this.dragAngle;
-                const startTime = Date.now();
-                
-                const animate = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    // Плавная анимация
-                    const easeProgress = this.easeOutCubic(progress);
-                    const currentAngle = startAngle + (targetAngle - startAngle) * easeProgress;
-                    
-                    this.updatePageTransform(page, currentAngle);
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    }
-                };
-                
-                requestAnimationFrame(animate);
-            }
-            
-            // ПЕРЕЛИСТЫВАНИЕ СТРАНИЦЫ
-            turnPage(direction) {
+            async turnPage(direction) {
                 if (this.isTurning) return;
                 
                 const newPage = this.currentPage + direction;
@@ -607,96 +543,100 @@
                 
                 this.isTurning = true;
                 
-                // Находим страницу для перелистывания
-                const pageToTurn = this.allPages.find(page => {
-                    const pageNum = parseInt(page.dataset.page);
-                    const isRightSide = page.dataset.side === 'right';
+                // Находим страницу для анимации
+                const pageToTurn = this.bookPages.find(p => {
+                    const pageNum = parseInt(p.dataset.page);
+                    const isRight = p.classList.contains('right');
                     
                     if (direction === 1) {
-                        return isRightSide && pageNum === this.currentPage;
+                        return isRight && pageNum === newPage;
                     } else {
-                        return !isRightSide && pageNum === this.currentPage + 1;
+                        return !isRight && pageNum === this.currentPage;
                     }
                 });
                 
                 if (pageToTurn) {
                     // Анимация перелистывания
                     const targetAngle = direction === 1 ? -180 : 180;
-                    this.animatePageTurn(pageToTurn, targetAngle, 800, () => {
-                        this.currentPage = newPage;
-                        this.showPage(this.currentPage);
-                        this.isTurning = false;
-                        this.updateControls();
-                        this.playSound();
-                    });
+                    
+                    // Плавная анимация
+                    pageToTurn.style.transform = `rotateY(${targetAngle}deg)`;
+                    pageToTurn.style.zIndex = '100';
+                    
+                    // Ждем окончания анимации
+                    await this.wait(800);
+                    
+                    // Обновляем состояние
+                    this.currentPage = newPage;
+                    this.updateDisplay();
+                    
+                    // Сбрасываем трансформацию
+                    pageToTurn.style.transform = 'rotateY(0deg)';
+                    pageToTurn.style.zIndex = '2';
+                    
+                    // Показываем/скрываем страницы
+                    this.updatePagesVisibility();
+                    
+                    // Звук
+                    this.playFlipSound();
                 }
+                
+                this.isTurning = false;
             }
             
-            // АНИМАЦИЯ ПЕРЕЛИСТЫВАНИЯ СТРАНИЦЫ
-            animatePageTurn(page, targetAngle, duration, onComplete) {
-                const startTime = Date.now();
-                const startAngle = 0;
+            goToPage(targetPage) {
+                if (targetPage < 1 || targetPage > this.pages.length || this.isTurning) return;
                 
-                page.classList.add('turning');
-                
-                const animate = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    
-                    // Эффект пружины в конце
-                    const easeProgress = this.easeOutBack(progress);
-                    const currentAngle = startAngle + (targetAngle - startAngle) * easeProgress;
-                    
-                    this.updatePageTransform(page, currentAngle);
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        page.classList.remove('turning');
-                        page.style.transform = '';
-                        page.style.zIndex = '1';
-                        if (onComplete) onComplete();
-                    }
-                };
-                
-                requestAnimationFrame(animate);
+                // Простой переход без анимации
+                this.currentPage = targetPage;
+                this.updateDisplay();
+                this.updatePagesVisibility();
             }
             
-            // ПОКАЗЫВАЕМ ТЕКУЩУЮ СТРАНИЦУ
-            showPage(pageNum) {
-                this.allPages.forEach(page => {
-                    const pNum = parseInt(page.dataset.page);
-                    const isVisible = pNum === pageNum || pNum === pageNum + 1;
-                    
-                    page.style.opacity = isVisible ? '1' : '0.3';
-                    page.style.pointerEvents = isVisible ? 'auto' : 'none';
-                });
-            }
-            
-            // ОБНОВЛЯЕМ УПРАВЛЕНИЕ
-            updateControls() {
+            updateDisplay() {
                 document.getElementById('current-page').textContent = this.currentPage;
                 document.getElementById('total-pages').textContent = this.pages.length;
                 
-                document.getElementById('prev-btn').disabled = this.currentPage <= 1 || this.isTurning;
-                document.getElementById('next-btn').disabled = this.currentPage >= this.pages.length || this.isTurning;
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                prevBtn.disabled = this.currentPage <= 1;
+                nextBtn.disabled = this.currentPage >= this.pages.length;
             }
             
-            // ФУНКЦИИ ПЛАВНОСТИ
-            easeOutCubic(t) {
-                return 1 - Math.pow(1 - t, 3);
+            updatePagesVisibility() {
+                this.bookPages.forEach(page => {
+                    const pageNum = parseInt(page.dataset.page);
+                    const isRight = page.classList.contains('right');
+                    
+                    if (isRight) {
+                        // Правая страница: видна если это следующая за текущей
+                        page.style.opacity = pageNum === this.currentPage + 1 ? '1' : '0';
+                    } else {
+                        // Левая страница: видна если это текущая
+                        page.style.opacity = pageNum === this.currentPage ? '1' : '0';
+                    }
+                });
             }
             
-            easeOutBack(t) {
-                const c1 = 1.70158;
-                const c3 = c1 + 1;
-                return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+            showStatus(type, message) {
+                const status = document.getElementById('status');
+                status.className = `status ${type} fade-in`;
+                status.textContent = message;
+                status.style.display = 'block';
+                
+                if (type === 'success') {
+                    setTimeout(() => {
+                        status.style.opacity = '0';
+                        setTimeout(() => {
+                            status.style.display = 'none';
+                        }, 300);
+                    }, 2000);
+                }
             }
             
-            // ЗВУК ПЕРЕЛИСТЫВАНИЯ
-            playSound() {
+            playFlipSound() {
                 try {
-                    // Создаем звук перелистывания
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     const oscillator = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
@@ -704,109 +644,53 @@
                     oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
                     
-                    oscillator.frequency.value = 150 + Math.random() * 50;
+                    oscillator.frequency.value = 100 + Math.random() * 50;
                     oscillator.type = 'sine';
                     
-                    gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                    gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
                     
                     oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.3);
+                    oscillator.stop(audioContext.currentTime + 0.2);
                 } catch (e) {
-                    // Браузер не поддерживает Web Audio API
+                    // Браузер не поддерживает
                 }
+            }
+            
+            wait(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
             }
         }
         
-        // ЗАПУСК ПРИ ЗАГРУЗКЕ
-        window.addEventListener('load', () => {
+        // ЗАПУСК КНИГИ
+        window.addEventListener('load', async () => {
             // ВАШИ ФАЙЛЫ
             const imageFiles = [
-                'SMART-AV_company0.jpg',   // 1 - обложка
-                'SMART-AV_company1.jpg',   // 2 
-                'SMART-AV_company2.jpg',   // 3
-                'SMART-AV_company3.jpg',   // 4
-                'SMART-AV_company4.jpg',   // 5
-                'SMART-AV_company5.jpg',   // 6
-                'SMART-AV_company6.jpg',   // 7
-                'SMART-AV_company7.jpg',   // 8
-                'SMART-AV_company8.jpg',   // 9
-                'SMART-AV_company9.jpg',   // 10
-                'SMART-AV_company10.jpg',  // 11
-                'SMART-AV_company11.jpg',  // 12
-                'SMART-AV_company12.jpg',  // 13
-                'SMART-AV_company13.jpg',  // 14
-                'SMART-AV_company14.jpg',  // 15
-                'SMART-AV_company15.jpg'   // 16
+                'SMART-AV_company0.jpg',   // Страница 1
+                'SMART-AV_company1.jpg',   // Страница 2
+                'SMART-AV_company2.jpg',   // Страница 3
+                'SMART-AV_company3.jpg',   // Страница 4
+                'SMART-AV_company4.jpg',   // Страница 5
+                'SMART-AV_company5.jpg',   // Страница 6
+                'SMART-AV_company6.jpg',   // Страница 7
+                'SMART-AV_company7.jpg',   // Страница 8
+                'SMART-AV_company8.jpg',   // Страница 9
+                'SMART-AV_company9.jpg',   // Страница 10
+                'SMART-AV_company10.jpg',  // Страница 11
+                'SMART-AV_company11.jpg',  // Страница 12
+                'SMART-AV_company12.jpg',  // Страница 13
+                'SMART-AV_company13.jpg',  // Страница 14
+                'SMART-AV_company14.jpg',  // Страница 15
+                'SMART-AV_company15.jpg'   // Страница 16
             ];
             
-            // Проверяем доступность файлов
-            const loadingEl = document.getElementById('loading');
-            let checkedCount = 0;
-            
-            function checkFile(filename, index) {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => resolve({ filename, index, ok: true });
-                    img.onerror = () => resolve({ filename, index, ok: false });
-                    img.src = `images/${filename}`;
-                });
+            try {
+                window.book = new SimpleBook('book-container', imageFiles);
+            } catch (error) {
+                document.getElementById('status').className = 'status error fade-in';
+                document.getElementById('status').textContent = `Ошибка: ${error.message}`;
+                document.getElementById('status').style.display = 'block';
             }
-            
-            // Проверяем все файлы
-            Promise.all(imageFiles.map(checkFile))
-                .then(results => {
-                    const failed = results.filter(r => !r.ok);
-                    
-                    if (failed.length > 0) {
-                        loadingEl.innerHTML = `⚠ ${failed.length} файлов не загружены`;
-                        console.warn('Не загружены:', failed.map(f => f.filename));
-                    }
-                    
-                    // Запускаем книгу
-                    setTimeout(() => {
-                        window.book = new Book3D('book', imageFiles);
-                    }, 500);
-                })
-                .catch(error => {
-                    loadingEl.innerHTML = 'Ошибка загрузки файлов';
-                    console.error(error);
-                });
-        });
-        
-        // Быстрая навигация по страницам
-        document.addEventListener('DOMContentLoaded', () => {
-            const hints = document.querySelector('.hints');
-            const quickNav = document.createElement('div');
-            quickNav.style.marginTop = '20px';
-            quickNav.style.display = 'flex';
-            quickNav.style.justifyContent = 'center';
-            quickNav.style.flexWrap = 'wrap';
-            quickNav.style.gap = '10px';
-            
-            [1, 3, 5, 8, 11, 13, 16].forEach(pageNum => {
-                const btn = document.createElement('button');
-                btn.textContent = pageNum;
-                btn.style.padding = '8px 15px';
-                btn.style.background = 'rgba(76, 201, 240, 0.2)';
-                btn.style.color = '#4cc9f0';
-                btn.style.border = '1px solid #4cc9f0';
-                btn.style.borderRadius = '20px';
-                btn.style.cursor = 'pointer';
-                btn.style.transition = 'all 0.3s';
-                btn.onmouseover = () => btn.style.background = 'rgba(76, 201, 240, 0.4)';
-                btn.onmouseout = () => btn.style.background = 'rgba(76, 201, 240, 0.2)';
-                btn.onclick = () => {
-                    if (window.book) {
-                        const diff = pageNum - window.book.currentPage;
-                        window.book.turnPage(diff > 0 ? 1 : -1);
-                    }
-                };
-                
-                quickNav.appendChild(btn);
-            });
-            
-            hints.parentNode.insertBefore(quickNav, hints.nextSibling);
         });
     </script>
 </body>
