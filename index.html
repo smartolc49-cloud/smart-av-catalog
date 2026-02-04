@@ -3,204 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART-AV | Каталог решений ProAV</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>SMART-AV Каталог</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.css">
     <style>
-        /* Дополнительные стили для книги */
-        .turn-page {
-            background-color: white;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
-        
-        .page-image {
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        h1 { 
+            color: white; 
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 30px;
+        }
+        .book-wrapper {
+            width: 100%;
+            height: 600px;
+            margin: 0 auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+        .page { background: white; }
+        .page img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            display: block;
         }
-        
-        /* Исправление для Turn.js */
-        #flipbook {
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        button {
+            padding: 10px 25px;
             background: white;
+            color: #764ba2;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        #flipbook .page {
-            background: white !important;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .page-info {
+            color: white;
+            font-size: 18px;
+            min-width: 120px;
+        }
+        .hint {
+            color: rgba(255,255,255,0.7);
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .error {
+            color: #ff6b6b;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .book-wrapper { height: 500px; }
+            h1 { font-size: 24px; }
+        }
+        @media (max-width: 480px) {
+            .book-wrapper { height: 400px; }
+            .controls { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
 <body>
-    <!-- Загрузочный экран -->
-    <div id="loader">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>Загрузка каталога SMART-AV...</p>
-        </div>
-    </div>
-
     <div class="container">
-        <!-- Шапка -->
-        <header class="header">
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-video"></i>
-                    <span>SMART<span class="logo-accent">AV</span></span>
-                </div>
-                <p class="tagline">Интегратор мультимедиа решений</p>
-            </div>
-            
-            <div class="controls-info">
-                <div class="control-hint">
-                    <i class="fas fa-mouse-pointer"></i>
-                    <span>Кликните по уголку страницы</span>
-                </div>
-                <div class="control-hint">
-                    <i class="fas fa-keyboard"></i>
-                    <span>Используйте ← → на клавиатуре</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Основной контейнер книги -->
+        <h1>SMART-AV</h1>
+        <p class="subtitle">Каталог решений</p>
+        
         <div class="book-wrapper">
-            <div class="flipbook-container" id="flipbook-container">
-                <div id="flipbook">
-                    <!-- Страницы будут добавлены через JavaScript -->
-                </div>
-            </div>
+            <div id="flipbook"></div>
         </div>
-
-        <!-- Панель управления -->
-        <div class="controls-panel">
-            <button id="prev-btn" class="control-btn">
-                <i class="fas fa-chevron-left"></i>
-                <span>Назад</span>
-            </button>
-            
-            <div class="page-info">
-                <span id="current-page">1</span>
-                <span class="separator">из</span>
-                <span id="total-pages">16</span>
-            </div>
-            
-            <button id="next-btn" class="control-btn">
-                <span>Вперед</span>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            
-            <div class="extra-controls">
-                <button id="fullscreen" class="icon-btn" title="Полный экран">
-                    <i class="fas fa-expand"></i>
-                </button>
-            </div>
+        
+        <div class="controls">
+            <button id="prev-btn">◀ Назад</button>
+            <div class="page-info">Страница: <span id="current-page">1</span>/<span id="total-pages">16</span></div>
+            <button id="next-btn">Вперед ▶</button>
         </div>
-
-        <!-- Навигация по разделам -->
-        <div class="quick-nav">
-            <h3><i class="fas fa-bookmark"></i> Быстрый переход:</h3>
-            <div class="nav-buttons">
-                <button data-page="1" class="nav-btn">Обложка</button>
-                <button data-page="3" class="nav-btn">Услуги</button>
-                <button data-page="4" class="nav-btn">Проекты</button>
-                <button data-page="13" class="nav-btn">Цифры</button>
-                <button data-page="15" class="nav-btn">Преимущества</button>
-                <button data-page="16" class="nav-btn">Контакты</button>
-            </div>
-        </div>
-
-        <!-- Звуковой контроллер -->
-        <div class="sound-control">
-            <button id="sound-toggle" class="sound-btn">
-                <i class="fas fa-volume-up"></i>
-                <span>Звук: Вкл</span>
-            </button>
-        </div>
-
-        <!-- Подвал -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="contact-info">
-                    <h4><i class="fas fa-phone-alt"></i> Контакты</h4>
-                    <p>+7 (495) 481-29-92</p>
-                    <p>8 (800) 777-78-92</p>
-                    <p>sales@smart-av.ru</p>
-                </div>
-                <div class="address">
-                    <h4><i class="fas fa-map-marker-alt"></i> Адрес</h4>
-                    <p>г. Москва, ул. Новоостаповская, д. 5, стр. 14, 6 этаж</p>
-                </div>
-                <div class="social">
-                    <h4><i class="fas fa-share-alt"></i> Соцсети</h4>
-                    <a href="https://vk.com/smartavvks" target="_blank" class="social-link">
-                        <i class="fab fa-vk"></i> VK
-                    </a>
-                    <a href="http://www.smart-av.ru" target="_blank" class="social-link">
-                        <i class="fas fa-globe"></i> Сайт
-                    </a>
-                </div>
-            </div>
-            <p class="copyright">© 2024 SMART-AV. Все права защищены.</p>
-        </footer>
+        
+        <p class="hint">Кликните по уголку страницы • Используйте клавиши ← →</p>
+        
+        <div id="error-message" class="error"></div>
     </div>
 
-    <!-- Скрипты -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script>
-        // ПРОСТОЙ КОД ДЛЯ БЫСТРОГО ИСПРАВЛЕНИЯ
         $(document).ready(function() {
-            console.log("Страница загружена");
+            console.log("Страница загружается...");
             
-            // Скрываем загрузчик
-            setTimeout(() => {
-                $('#loader').fadeOut(500);
-                console.log("Загрузчик скрыт");
-            }, 1000);
+            // СПИСОК ФАЙЛОВ - ТОЧНО ТАК КАК НА GITHUB
+            const imageFiles = [
+                'SMART-AV_company0.jpg',
+                'SMART-AV_company1.jpg', 
+                'SMART-AV_company2.jpg',
+                'SMART-AV_company3.jpg',
+                'SMART-AV_company4.jpg',
+                'SMART-AV_company5.jpg',
+                'SMART-AV_company6.jpg',
+                'SMART-AV_company7.jpg',
+                'SMART-AV_company8.jpg',
+                'SMART-AV_company9.jpg',
+                'SMART-AV_company10.jpg',
+                'SMART-AV_company11.jpg',
+                'SMART-AV_company12.jpg',
+                'SMART-AV_company13.jpg',
+                'SMART-AV_company14.jpg',
+                'SMART-AV_company15.jpg'
+            ];
             
-            // Создаем страницы
-            const flipbook = $('#flipbook');
-            for (let i = 1; i <= 16; i++) {
-                flipbook.append(`
-                    <div class="page">
-                        <img src="images/page${i}.jpg" alt="Страница ${i}" 
-                             style="width: 100%; height: 100%; object-fit: contain;">
-                        <div style="position: absolute; bottom: 10px; right: 10px; 
-                                   background: rgba(0,0,0,0.5); color: white; 
-                                   padding: 5px 10px; border-radius: 15px; font-size: 12px;">
-                            ${i}
-                        </div>
-                    </div>
-                `);
+            // Проверяем доступность файлов
+            function checkImages() {
+                let loaded = 0;
+                const total = imageFiles.length;
+                
+                imageFiles.forEach((file, index) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        loaded++;
+                        console.log(`✓ ${file} загружен`);
+                        if (loaded === total) {
+                            console.log("Все изображения загружены!");
+                            createBook();
+                        }
+                    };
+                    img.onerror = function() {
+                        console.error(`✗ Ошибка загрузки: ${file}`);
+                        $('#error-message').html(
+                            `Ошибка: файл ${file} не найден!<br>
+                             Проверьте: https://smartolc49-cloud.github.io/smart-av-catalog/images/${file}`
+                        ).show();
+                    };
+                    img.src = `images/${file}?t=${Date.now()}`;
+                });
             }
             
-            // Инициализируем книгу
-            flipbook.turn({
-                width: 800,
-                height: 600,
-                autoCenter: true,
-                duration: 1000
-            });
+            // Создаем книгу
+            function createBook() {
+                console.log("Создаем книгу...");
+                const flipbook = $('#flipbook');
+                
+                // Очищаем, если что-то есть
+                flipbook.empty();
+                
+                // Добавляем страницы
+                imageFiles.forEach((file, index) => {
+                    const pageNum = index + 1;
+                    flipbook.append(`
+                        <div class="page">
+                            <img src="images/${file}" 
+                                 alt="Страница ${pageNum}"
+                                 onerror="this.src='https://via.placeholder.com/800x600/ccc/333?text=Страница+${pageNum}'">
+                        </div>
+                    `);
+                });
+                
+                // Инициализируем Turn.js
+                try {
+                    flipbook.turn({
+                        width: '100%',
+                        height: '100%',
+                        autoCenter: true,
+                        duration: 700,
+                        when: {
+                            turned: function(e, page) {
+                                $('#current-page').text(page);
+                            }
+                        }
+                    });
+                    
+                    console.log("Книга создана успешно!");
+                    
+                    // Кнопки управления
+                    $('#prev-btn').click(() => flipbook.turn('previous'));
+                    $('#next-btn').click(() => flipbook.turn('next'));
+                    
+                    // Клавиатура
+                    $(document).keydown(function(e) {
+                        if (e.keyCode === 37) flipbook.turn('previous');
+                        if (e.keyCode === 39) flipbook.turn('next');
+                    });
+                    
+                    $('#total-pages').text(imageFiles.length);
+                    
+                } catch (error) {
+                    console.error("Ошибка Turn.js:", error);
+                    $('#error-message').html(
+                        `Ошибка инициализации книги: ${error.message}<br>
+                         Проверьте подключение библиотек.`
+                    ).show();
+                }
+            }
             
-            console.log("Книга инициализирована");
+            // Запускаем проверку
+            checkImages();
             
-            // Простые кнопки
-            $('#prev-btn').click(() => flipbook.turn('previous'));
-            $('#next-btn').click(() => flipbook.turn('next'));
-            
-            // Навигация
-            $('.nav-btn').click(function() {
-                const page = $(this).data('page');
-                flipbook.turn('page', page);
-            });
-            
-            // Обновление номера страницы
-            flipbook.bind('turned', function(e, page) {
-                $('#current-page').text(page);
-            });
-            
-            $('#total-pages').text('16');
+            // Если через 5 секунд ничего не произошло
+            setTimeout(() => {
+                if ($('#flipbook').children().length === 0) {
+                    $('#error-message').html(
+                        `Проверьте:<br>
+                         1. Файлы в папке images/<br>
+                         2. Права доступа<br>
+                         3. Консоль браузера (F12)`
+                    ).show();
+                }
+            }, 5000);
         });
     </script>
 </body>
