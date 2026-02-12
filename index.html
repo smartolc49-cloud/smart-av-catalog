@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART-AV Каталог</title>
+    
+    <!-- СТИЛИ -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts/icomoon.css">
+    
+    <!-- JQUERY (ОБЯЗАТЕЛЬНО) -->
+    <script src="javascript/jquery-3.5.1.min.js"></script>
+    
+    <!-- ОСНОВНОЙ ДВИЖОК ФЛИПБУКА -->
+    <script src="javascript/expandbook.min.js"></script>
+    <script src="javascript/pageItems.min.js"></script>
+    <script src="javascript/book.min.js"></script>
+    
+    <!-- КОНФИГУРАЦИЯ СТРАНИЦ -->
+    <script src="search/book_config.js"></script>
+    <script src="search/text_position[1].js"></script>
+    <script src="search/text_position[2].js"></script>
+    <script src="search/text_position[3].js"></script>
+    <script src="search/text_position[4].js"></script>
+    <script src="search/text_position[5].js"></script>
+    <script src="search/text_position[6].js"></script>
+    <script src="search/text_position[7].js"></script>
+    <script src="search/text_position[8].js"></script>
+    <script src="search/text_position[9].js"></script>
+    <script src="search/text_position[10].js"></script>
+    <script src="search/text_position[11].js"></script>
+    <script src="search/text_position[12].js"></script>
+</head>
+<body>
+    <div id="flipbook-container">
+        <div id="flipbook">
+            <!-- СТРАНИЦЫ 1-12 -->
+            <div><img src="page/1.jpg"></div>
+            <div><img src="page/2.jpg"></div>
+            <div><img src="page/3.jpg"></div>
+            <div><img src="page/4.jpg"></div>
+            <div><img src="page/5.jpg"></div>
+            <div><img src="page/6.jpg"></div>
+            <div><img src="page/7.jpg"></div>
+            <div><img src="page/8.jpg"></div>
+            <div><img src="page/9.jpg"></div>
+            <div><img src="page/10.jpg"></div>
+            <div><img src="page/11.jpg"></div>
+            <div><img src="page/12.jpg"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // ИНИЦИАЛИЗАЦИЯ ФЛИПБУКА
+            $("#flipbook").turn({
+                width: 1200,
+                height: 800,
+                autoCenter: true,
+                elevation: 50,
+                duration: 600,
+                page: 1,
+                gradients: true,
+                acceleration: true
+            });
+            
+            // ЗВУК ПЕРЕЛИСТЫВАНИЯ
+            const flipSound = new Audio('sounds/flipsound.mp3');
+            
+            $("#flipbook").bind("turning", function(event, page, view) {
+                flipSound.play();
+            });
+        });
+    </script>
+</body>
+</html>
